@@ -19,7 +19,7 @@ void		error_check(char val, const char *msg)
 static void	prepare_frame(SDL_Window *win)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	SDL_GL_SwapWindow(win);
 }
 
