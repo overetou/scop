@@ -24,20 +24,17 @@ static void	error_check_gl(GLenum error)
 }
 
 void	create_vbo(UINT *vao_id, UINT *vbo_id, UINT *color_buffer_id)
-{
-	GLfloat Vertices[] = {
-	-0.8f,	0.8f, 0.0f, 1.0f,
-	 0.8f,	0.8f, 0.0f, 1.0f,
+{	GLfloat Vertices[] = {
 	-0.8f, -0.8f, 0.0f, 1.0f,
+	 0.0f,	0.8f, 0.0f, 1.0f,
 	 0.8f, -0.8f, 0.0f, 1.0f
-};
+	};
 
 	GLfloat Colors[] = {
 	1.0f, 0.0f, 0.0f, 1.0f,
 	0.0f, 1.0f, 0.0f, 1.0f,
-	0.0f, 0.0f, 1.0f, 1.0f,
-	1.0f, 1.0f, 1.0f, 1.0f
-};
+	0.0f, 0.0f, 1.0f, 1.0f
+	};
 
 	glGenVertexArrays(1, vao_id);
 	glBindVertexArray(*vao_id);
