@@ -35,9 +35,9 @@ const char *shader_source)
 void	allocate_graphic_side_objects(UINT *handles)
 {
 	float		vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f
 	};
 
 	glGenVertexArrays(1, handles + 4);
@@ -54,8 +54,10 @@ void	allocate_graphic_side_objects(UINT *handles)
 	check_compilation_step_success(handles[3], glGetProgramiv, GL_LINK_STATUS);
 	glDeleteShader(handles[1]);
 	glDeleteShader(handles[2]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+	glEnableVertexAttribArray(1);
 	glUseProgram(handles[3]);
 }
 

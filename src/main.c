@@ -62,30 +62,23 @@ static void render_frame(void)
 */
 void init_render(SDL_Window *win)
 {
-	//puts("step 1");
 	UINT handles[5];
-	//puts("step 2");
 	char params[2];
+	//int uniform_location;
 
-	//puts("step 3");
 	params[0] = 1;
 	params[1] = 0;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-	//puts("step 4");
 	glClearColor(0.3, 0.3, 0.3, 1);
-	//puts("step 5");
 	allocate_graphic_side_objects(handles);
-	//puts("step 6");
+	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
+	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
 	while (params[0])
 	{
-	//puts("step 7");
 		render_frame();
-	//puts("step 8");
 		SDL_GL_SwapWindow(win);
-	//puts("step 9");
 		handle_events(params);
 	}
-		//puts("step 10");
 	desallocate_graphic_side_objects(handles);
 }
 

@@ -13,23 +13,25 @@
 #define UINT unsigned int
 #define VERTEX_SHADER_SOURCE "#version 440 core\n"\
 "layout (location = 0) in vec3 aPos;"\
-"out vec4 vertexColor;"\
+"layout (location = 1) in vec3 aColor;"\
+"out vec3 ourColor;"\
 "void main()"\
 "{"\
 "	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);"\
-"	vertexColor = vec4(0.5, 0, 0, 1);"\
+"	ourColor = aColor;"\
 "}"
 
 #define FRAGMENT_SHADER_SOURCE "#version 440 core\n"\
-"in vec4 vertexColor;"\
+"in vec3 ourColor;"\
 "out vec4 FragColor;"\
 "void main()"\
 "{"\
-"    FragColor = vertexColor;"\
+"    FragColor = vec4(ourColor, 1.0);"\
 "}"
 #define USAGE "Wrong number of arguments.\nUsage:\t./scop"\
 " <file>.obj <file>.bmp\n\tOr\n\t./scop [specs /"\
 " vertex_shader_source / fragment_shader_source]"
+//"uniform vec4 fixedColor;"
 
 void	process_args(const int argc, const char *argv[]);
 void	error_check(char val, const char *msg);
