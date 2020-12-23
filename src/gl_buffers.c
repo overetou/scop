@@ -40,8 +40,8 @@ void	allocate_graphic_side_objects(UINT *handles)
      0.0f,  0.5f, 0.0f
 	};
 
-	glGenBuffers(1, handles);
 	glGenVertexArrays(1, handles + 4);
+	glGenBuffers(1, handles);
 	glBindVertexArray(handles[4]);
 	glBindBuffer(GL_ARRAY_BUFFER, *handles);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -57,10 +57,11 @@ void	allocate_graphic_side_objects(UINT *handles)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 	glUseProgram(handles[3]);
-	glBindVertexArray(handles[4]);
 }
 
-/* void desallocate_graphic_side_objects(UINT *handles)
+void	desallocate_graphic_side_objects(UINT *handles)
 {
-	
-} */
+	glDeleteVertexArrays(1, handles + 4);
+	glDeleteBuffers(1, handles);
+	glDeleteProgram(handles[3]);
+}

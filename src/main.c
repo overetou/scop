@@ -16,7 +16,7 @@ void		error_check(char val, const char *msg)
 	exit(0);
 }
 
-void handle_events(char *keep_going)
+void handle_events(char *params)
 {
 	SDL_Event e;
 
@@ -26,14 +26,22 @@ void handle_events(char *keep_going)
 		{
 			if (e.window.event == SDL_WINDOWEVENT_CLOSE)
 			{
-				*keep_going = 0;
+				*params = 0;
 				break;
 			}
 		}
 		else if (e.type == SDL_KEYDOWN)
 		{
 			if (e.key.keysym.sym == SDLK_ESCAPE)
-				*keep_going = 0;
+				*params = 0;
+			else if (e.key.keysym.sym == SDLK_w)
+			{
+				if (params[1])
+					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				else
+					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				params[1] = !(params[1]);
+			}
 			break;
 		}
 	}
@@ -49,31 +57,36 @@ static void render_frame(void)
 **handles: 0-raw_vertices_data_handle, 1-vertex_shader_handle, 2-fragment
 **_shader_handle, 3-shader_program, 4-vertexArrayObject
 **Those handles are handles on the graphic card memory.
+**params[0] = keep_going
+**params[1] = wireframe mode enabled
 */
 void init_render(SDL_Window *win)
 {
 	//puts("step 1");
 	UINT handles[5];
 	//puts("step 2");
-	char keep_going = 1;
+	char params[2];
 
 	//puts("step 3");
+	params[0] = 1;
+	params[1] = 0;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	//puts("step 4");
 	glClearColor(0.3, 0.3, 0.3, 1);
 	//puts("step 5");
 	allocate_graphic_side_objects(handles);
 	//puts("step 6");
-	while (keep_going)
+	while (params[0])
 	{
 	//puts("step 7");
 		render_frame();
 	//puts("step 8");
 		SDL_GL_SwapWindow(win);
 	//puts("step 9");
-		handle_events(&keep_going);
+		handle_events(params);
 	}
 		//puts("step 10");
+	desallocate_graphic_side_objects(handles);
 }
 
 int			main(int argc, char const *argv[])
