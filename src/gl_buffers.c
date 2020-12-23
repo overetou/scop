@@ -1,95 +1,66 @@
 #include "scop.h"
 
-static void	error_check_gl(GLenum error)
+static void check_compilation_step_success(UINT handle,
+void(*getter)(UINT, GLenum, int*), GLenum status)
 {
-	if (error == GL_NO_ERROR)
+	int success;
+	char info_log[512];
+
+	getter(handle, status, &success);
+	if (success)
 		return;
-	if (error == GL_INVALID_ENUM)
-		puts("An unacceptable value is specified for an enumerated argument.");
-	else if (error == GL_INVALID_VALUE)
-		puts("A numeric argument is out of range.");
-	else if (error == GL_INVALID_OPERATION)
-		puts("The specified operation is not allowed in the current state.");
-	else if (error == GL_INVALID_FRAMEBUFFER_OPERATION)
-		puts("The framebuffer object is not complete.");
-	else if (error == GL_OUT_OF_MEMORY)
-		puts("There is not enough memory left to execute the command.");
-	else if (error == GL_STACK_UNDERFLOW)
-		puts("An attempt has been made to perform an operation that would cause an internal stack to underflow.");
-	else if (error == GL_STACK_OVERFLOW)
-		puts("An attempt has been made to perform an operation that would cause an internal stack to overflow.");
-	else
-		puts("Unknown error.");
+	glGetShaderInfoLog(handle, 512, NULL, info_log);
+	printf("Shader compilation failed: %s\n", info_log);
 	exit(0);
 }
 
-void	create_vbo(UINT *vao_id, UINT *vbo_id, UINT *color_buffer_id)
-{	GLfloat Vertices[] = {
-	-0.8f, -0.8f, 0.0f, 1.0f,
-	 0.0f,	0.8f, 0.0f, 1.0f,
-	 0.8f, -0.8f, 0.0f, 1.0f
+static void compile_shader(GLenum shader_type, UINT *shader_handle,
+const char *shader_source)
+{
+	*shader_handle = glCreateShader(shader_type);
+	glShaderSource(*shader_handle, 1, &shader_source, NULL);
+	glCompileShader(*shader_handle);
+	check_compilation_step_success(*shader_handle,	glGetShaderiv,
+	GL_COMPILE_STATUS);
+}
+
+/*
+**We bind our raw buffers to targets to further describe
+**how they should be used.
+**glBufferData copies the target data to the graphic card's memory.
+**Additionaly, it gives a hint: GL_STATIC_DRAW means that that buffer data
+**will be set only one time, but used many times.
+**glVertexAttribPointer: a function used to configure the vertex shader argse.
+*/
+void	allocate_graphic_side_objects(UINT *handles)
+{
+	float		vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f,
+     0.0f,  0.5f, 0.0f
 	};
 
-	GLfloat Colors[] = {
-	1.0f, 0.0f, 0.0f, 1.0f,
-	0.0f, 1.0f, 0.0f, 1.0f,
-	0.0f, 0.0f, 1.0f, 1.0f
-	};
-
-	glGenVertexArrays(1, vao_id);
-	glBindVertexArray(*vao_id);
-	glGenBuffers(1, vbo_id);
-	glBindBuffer(GL_ARRAY_BUFFER, *vbo_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glGenBuffers(1, handles);
+	glGenVertexArrays(1, handles + 4);
+	glBindVertexArray(handles[4]);
+	glBindBuffer(GL_ARRAY_BUFFER, *handles);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	compile_shader(GL_VERTEX_SHADER, handles + 1, VERTEX_SHADER_SOURCE);
+	compile_shader(GL_FRAGMENT_SHADER, handles + 2, FRAGMENT_SHADER_SOURCE);
+	handles[3] = glCreateProgram();
+	glAttachShader(handles[3], handles[1]);
+	glAttachShader(handles[3], handles[2]);
+	glLinkProgram(handles[3]);
+	check_compilation_step_success(handles[3], glGetProgramiv, GL_LINK_STATUS);
+	glDeleteShader(handles[1]);
+	glDeleteShader(handles[2]);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	glGenBuffers(1, color_buffer_id);
-	glBindBuffer(GL_ARRAY_BUFFER, *color_buffer_id);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Colors), Colors, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(1);
-	error_check_gl(glGetError());
+	glUseProgram(handles[3]);
+	glBindVertexArray(handles[4]);
 }
 
-void	destroy_vbo(UINT *vao_id, UINT *vbo_id, UINT *color_buffer_id)
+/* void desallocate_graphic_side_objects(UINT *handles)
 {
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, color_buffer_id);
-	glDeleteBuffers(1, vbo_id);
-	glBindVertexArray(0);
-	glDeleteVertexArrays(1, vao_id);
-	error_check_gl(glGetError());
-}
-
-void	create_shaders(UINT *vert_shad_id, UINT *frag_shad_id, UINT *prog_id)
-{
-	const GLchar *src;
-
-	*vert_shad_id = glCreateShader(GL_VERTEX_SHADER);
-	src = VERTEX_SHADER_SOURCE;
-	glShaderSource(*vert_shad_id, 1, &src, NULL);
-	glCompileShader(*vert_shad_id);
-	*frag_shad_id = glCreateShader(GL_FRAGMENT_SHADER);
-	src = FRAGMENT_SHADER_SOURCE;
-	glShaderSource(*frag_shad_id, 1, &src, NULL);
-	glCompileShader(*frag_shad_id);
-	*prog_id = glCreateProgram();
-	glAttachShader(*prog_id, *vert_shad_id);
-	glAttachShader(*prog_id, *frag_shad_id);
-	glLinkProgram(*prog_id);
-	glUseProgram(*prog_id);
-	error_check_gl(glGetError());
-}
-
-void	destroy_shaders(UINT *vert_shad_id, UINT *frag_shad_id, UINT *prog_id)
-{
-	glUseProgram(0);
-	glDetachShader(*prog_id, *vert_shad_id);
-	glDetachShader(*prog_id, *frag_shad_id);
-	glDeleteShader(*frag_shad_id);
-	glDeleteShader(*vert_shad_id);
-	glDeleteProgram(*prog_id);
-	error_check_gl(glGetError());
-}
+	
+} */
