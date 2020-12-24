@@ -1,4 +1,5 @@
 #include "scop.h"
+#include "stb_image.h"
 
 static void	error_check_sdl(char val)
 {
@@ -47,22 +48,23 @@ void handle_events(char *params)
 	}
 }
 
-static void render_frame(void)
+static void render_frame(UINT texture)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
 /*
 **handles: 0-raw_vertices_data_handle, 1-vertex_shader_handle, 2-fragment
-**_shader_handle, 3-shader_program, 4-vertexArrayObject
+**_shader_handle, 3-shader_program, 4-vertexArrayObject	5-EBO
 **Those handles are handles on the graphic card memory.
 **params[0] = keep_going
 **params[1] = wireframe mode enabled
 */
 void init_render(SDL_Window *win)
 {
-	UINT handles[5];
+	UINT handles[6];
 	char params[2];
 	//int uniform_location;
 
@@ -73,9 +75,32 @@ void init_render(SDL_Window *win)
 	allocate_graphic_side_objects(handles);
 	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
 	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
+	
+	unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    int width, height, nrChannels;
+    // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
+    unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+        puts("Failed to load texture");
+    stbi_image_free(data);
+
 	while (params[0])
 	{
-		render_frame();
+		render_frame(texture);
 		SDL_GL_SwapWindow(win);
 		handle_events(params);
 	}

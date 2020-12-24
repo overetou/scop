@@ -2,3 +2,5 @@
 obj/*
 scop
 src/test.c
+container.jpg
+includes/stb_image.h

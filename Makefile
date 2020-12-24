@@ -8,28 +8,28 @@ INC_DIRS=includes
 LIB_DIRS=/media/jxxj/DATA/Documents/code/unix/config/libft
 
 #Compilation related indications
-CC=gcc
-CFLAGS=-Wall -Wextra -Werror
+CC=g++
+CPPFLAGS=
 LIBS=SDL2 GL GLEW m#m stands for mathlib
 
 #From there we use the info to compile everything.
-SRC_FILE_NAMES = main.c process_args.c gl_buffers.c utils.c
+SRC_FILE_NAMES = main.cpp process_args.cpp gl_buffers.cpp loader.cpp
 SOURCES=$(addprefix $(SRC_DIR)/, $(SRC_FILE_NAMES))
-OBJS:=$(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+OBJS:=$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 INC_FLAGS=$(addprefix -I,$(INC_DIRS))
 LIBIDR_FLAGS=$(addprefix -L,$(LIB_DIRS))
-CFLAGS+=$(INC_FLAGS)
+CPPFLAGS+=$(INC_FLAGS)
 LIBS_FLAGS=$(addprefix -l,$(LIBS))
 VPATH=$(SRC_DIR)
 
 .phony: $(TARGET) clean re
 
 $(TARGET): $(OBJS) $(INC_DIRS)/scop.h
-	@$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LIBIDR_FLAGS) $(LIBS_FLAGS)
+	@$(CC) $(CPPFLAGS) $(OBJS) -o $(TARGET) $(LIBIDR_FLAGS) $(LIBS_FLAGS)
 	@echo "\033[0;32mCompilation succeeded.\033[0m"
 
-$(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c |$(OBJ_DIR)
-	@$(COMPILE.c) $(OUTPUT_OPTIONS) -o $@ $<
+$(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp |$(OBJ_DIR)
+	@$(COMPILE.cpp) $(OUTPUT_OPTIONS) -o $@ $<
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
