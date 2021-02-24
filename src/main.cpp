@@ -1,5 +1,7 @@
 #include "scop.h"
 #include "stb_image.h"
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
 
 static void	error_check_sdl(char val)
 {
@@ -52,22 +54,32 @@ static void render_frame(UINT *handles, UINT texture)
 {
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	// create transformations
-	glm::mat4 model		 = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-		glm::mat4 view		  = glm::mat4(1.0f);
-		glm::mat4 projection	= glm::mat4(1.0f);
-		model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-		view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-		projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-		// retrieve the matrix uniform locations
-		unsigned int modelLoc = glGetUniformLocation(handles[3], "model");
-		unsigned int viewLoc  = glGetUniformLocation(handles[3], "view");
-		// pass them to the shaders (3 different ways)
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, &view[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, &projection[0][0]);
+	//create transformations
+	glm::mat4 model = glm::mat4(1.0f);//make sure to initialize matrix to identity matrix first
+	int i = 0;
+	float *f =glm::value_ptr(model);
+	while (i != 16)
+	{
+		printf("%f ", f[i]);
+		i++;
+	}
+	printf("\n");
+	exit(0);
+	glm::mat4 view		  = glm::mat4(1.0f);
+	glm::mat4 projection	= glm::mat4(1.0f);
+	model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 1.0f));
+	view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	// retrieve the matrix uniform locations
+	unsigned int modelLoc = glGetUniformLocation(handles[3], "model");
+	unsigned int viewLoc  = glGetUniformLocation(handles[3], "view");
+	// pass them to the shaders (3 different ways)
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 

@@ -5,7 +5,7 @@ TARGET=scop
 OBJ_DIR=obj
 SRC_DIR=src
 INC_DIRS=includes
-LIB_DIRS=/media/jxxj/DATA/Documents/code/unix/config/libft
+LIB_DIRS=
 
 #Compilation related indications
 CC=g++
@@ -26,7 +26,7 @@ VPATH=$(SRC_DIR)
 
 $(TARGET): $(OBJS) $(INC_DIRS)/scop.h
 	@$(CC) $(CPPFLAGS) $(OBJS) -o $(TARGET) $(LIBIDR_FLAGS) $(LIBS_FLAGS)
-	@echo "\033[0;32mCompilation succeeded.\033[0m"
+	@echo "Compilation succeeded."
 
 $(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp |$(OBJ_DIR)
 	@$(COMPILE.cpp) $(OUTPUT_OPTIONS) -o $@ $<
