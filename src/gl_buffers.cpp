@@ -1,4 +1,6 @@
 #include "scop.h"
+#include "fcntl.h"
+#include "unistd.h"
 
 static void check_compilation_step_success(UINT handle,
 void(*getter)(UINT, GLenum, int*), GLenum status)
@@ -24,6 +26,20 @@ const char *shader_source)
 	GL_COMPILE_STATUS);
 }
 
+void			load_obj(const char *path, t_parsing_storage *storage)
+{
+	int			fd;
+
+	fd = open(path, O_RDONLY);
+	if (fd != -1)
+		do_obj_parsing(fd, storage, 0);
+	else
+	{
+		puts("could not open the given obj file.");
+		exit(0);
+	}
+}
+
 /*
 **We bind our raw buffers to targets to further describe
 **how they should be used.
@@ -32,62 +48,27 @@ const char *shader_source)
 **will be set only one time, but used many times.
 **glVertexAttribPointer: a function used to configure the vertex shader argse.
 */
-void	allocate_graphic_side_objects(UINT *handles)
+void	allocate_graphic_side_objects(UINT *handles, const char *path)
 {
-	float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	t_parsing_storage parsing_info;
+	GLfloat	*obj_final_data[3];
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-	/* unsigned int indices[] = {  
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	}; */
-
+	load_obj(path, &parsing_info);
+	normalize_obj(&parsing_info);
+	obj_final_data[0] = load_vertex_data_from_storage(&parsing_info,
+	&(obj_final_data[1]), &(obj_final_data[2]));
+	int i = 0;
+	while (i < parsing_info.v_nb)
+	{
+		printf("%f, %f, %f\n", parsing_info.vert[i], parsing_info.vert[i + 1], parsing_info.vert[i+ 2]);
+		i += 3;
+	}
 	glGenVertexArrays(1, handles + 4);
 	glGenBuffers(1, handles);
 	//glGenBuffers(1, handles + 5);
 	glBindVertexArray(handles[4]);
 	glBindBuffer(GL_ARRAY_BUFFER, *handles);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, parsing_info.v_nb, parsing_info.vert, GL_STATIC_DRAW);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handles[5]);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	compile_shader(GL_VERTEX_SHADER, handles + 1, VERTEX_SHADER_SOURCE);

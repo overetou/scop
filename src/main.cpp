@@ -78,7 +78,7 @@ static void render_frame(UINT *handles, UINT texture)
 **params[0] = keep_going
 **params[1] = wireframe mode enabled
 */
-void init_render(SDL_Window *win)
+void init_render(SDL_Window *win, const char *obj_path)
 {
 	UINT handles[6];
 	char params[2];
@@ -89,7 +89,7 @@ void init_render(SDL_Window *win)
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClearColor(0.3, 0.3, 0.3, 1);
 	glEnable(GL_DEPTH_TEST);
-	allocate_graphic_side_objects(handles);
+	allocate_graphic_side_objects(handles, obj_path);
 	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
 	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
 	
@@ -145,8 +145,7 @@ int			main(int argc, char const *argv[])
 	SDL_GL_MakeCurrent(win, glcontext);
 	error_check_sdl(SDL_GL_SetSwapInterval(1) == 0);
 	error_check(glewInit() == GLEW_OK, "Failed to load OpenGL Functions.");
-	process_args(argc, argv);
-	init_render(win);
+	init_render(win, process_args(argc, argv));
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(win);
 	SDL_Quit();

@@ -29,7 +29,18 @@ static char	str_cmp_n(const char *s1, const char *s2, int len1, int len2)
 	return (1);
 }
 
-void		process_args(const int argc, const char *argv[])
+char is_obj(const char *path)
+{
+	int i;
+
+	i = 0;
+	while (path[i])
+		i++;
+	return (i >= 5 && path[i - 1] == 'j' && path[i - 2] == 'b' &&
+	path[i - 3] == 'o' && path[i - 4] == '.');
+}
+
+const char	*process_args(const int argc, const char *argv[])
 {
 	int len;
 
@@ -46,6 +57,7 @@ void		process_args(const int argc, const char *argv[])
 			puts("No match for given argument." USAGE);
 		exit(0);
 	}
-	error_check(argc == 3, "Wrong number of arguments." USAGE);
-	
+	error_check(argc == 3 && is_obj(argv[1]),
+	"Invalid arguments given." USAGE);
+	return (argv[1]);
 }

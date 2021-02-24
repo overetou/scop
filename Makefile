@@ -5,7 +5,7 @@ TARGET=scop
 OBJ_DIR=obj
 SRC_DIR=src
 INC_DIRS=includes
-LIB_DIRS=/media/jxxj/DATA/Documents/code/unix/config/libft
+LIB_DIRS=
 
 #Compilation related indications
 CC=g++
@@ -13,7 +13,7 @@ CPPFLAGS=
 LIBS=SDL2 GL GLEW m#m stands for mathlib
 
 #From there we use the info to compile everything.
-SRC_FILE_NAMES = main.cpp process_args.cpp gl_buffers.cpp loader.cpp
+SRC_FILE_NAMES = main.cpp process_args.cpp gl_buffers.cpp loader.cpp obj_loader.cpp	parsing.cpp	obj_builer.cpp trio_simplification.cpp vectors.cpp
 SOURCES=$(addprefix $(SRC_DIR)/, $(SRC_FILE_NAMES))
 OBJS:=$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 INC_FLAGS=$(addprefix -I,$(INC_DIRS))
