@@ -90,12 +90,43 @@ GLfloat	square(GLfloat f)
 	return (f * f);
 }
 
-void	rotation_mat4(GLfloat *mat4, const GLfloat radian_angle, GLfloat *axis)
+void	normalize(GLfloat *vec)
 {
-	mat4[5] = cos(radian_angle) * axis[0];
+	GLfloat w = sqrt( vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] );
+    vec[0] /= w;
+    vec[1] /= w;
+    vec[2] /= w;
+}
+
+void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
+{
+	float angle_rad = radian_angle * (3.14159265359/180.0f);
+    float c = cos(angle_rad);
+    float s = sin(angle_rad);
+    float t = 1 - c;
+	normalize(axis);
+
+	mat4[0] = c + axis[0] * axis[0] * t;
+	mat4[1] = axis[1] * axis[0] * t + axis[2] * s;
+	mat4[2] = axis[2] * axis[0] * t-axis[1] * s;
+	mat4[3] = 0;
+    mat4[4] = axis[0] * axis[1] * t - axis[2] * s;
+	mat4[5] = c + axis[1] *axis[1] * t;
+	mat4[6] = axis[2] * axis[1] * t+axis[0] * s;
+	mat4[7] = 0;
+    mat4[8] = axis[0] * axis[2] * t + axis[1] * s;
+	mat4[9] = axis[1] * axis[2] * t - axis[0] * s;
+	mat4[10] = axis[2] * axis[2] * t + c;
+	mat4[11] = 0;
+    mat4[12] = 0;
+	mat4[13] = 0;
+	mat4[14] = 0;
+	mat4[15] = 1;
+
+	/* mat4[5] = cos(radian_angle) * axis[0];
 	mat4[6] = sin(radian_angle) * axis[0];
 	mat4[9] = -sin(radian_angle) * axis[0];
-	mat4[10] = cos(radian_angle) * axis[0];
+	mat4[10] = cos(radian_angle) * axis[0]; */
 
 	/* mat4[0] = cos(radian_angle) * axis[1];
 	mat4[2] = -sin(radian_angle) * axis[1];
@@ -112,7 +143,7 @@ static void render_frame(UINT *handles, UINT texture)
 {
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
-	GLfloat	vec[] = {1.0f, 0.0f, 0.0f};
+	GLfloat	vec[] = {1.0f, 0.5f, 0.3f};
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -122,7 +153,7 @@ static void render_frame(UINT *handles, UINT texture)
 	glm::mat4 projection = glm::mat4(1.0f);
 	model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	GLfloat	*home_model = identity_mat4();
-	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), vec);
+	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, vec);
 	//compare_matrixes(glm::value_ptr(model), home_model, "model");
 	view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
