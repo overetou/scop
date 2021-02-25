@@ -50,41 +50,6 @@ void handle_events(char *params)
 	}
 }
 
-size_t	loop_nb = 0;
-
-//TO_DELETE
-void	print_mat4(float *mat)
-{
-	int i = 0;
-
-	while (i != 16)
-	{
-		printf("%f ", mat[i]);
-		i++;
-	}
-}
-
-//TO_DELETE
-void	compare_matrixes(float *official_mat, float *home_made_mat, const char *mat_name)
-{
-	int i = 0;
-
-	while (i != 16)
-	{
-		if (official_mat[i] != home_made_mat[i])
-		{
-			printf("Mat diff detected on loop %lu, for matrix '%s'.\n", loop_nb, mat_name);
-			print_mat4(official_mat);
-			puts("");
-			print_mat4(home_made_mat);
-			puts("");
-			printf("\n");
-			exit(0);
-		}
-		i++;
-	}
-}
-
 GLfloat	square(GLfloat f)
 {
 	return (f * f);
@@ -122,21 +87,6 @@ void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 	mat4[13] = 0;
 	mat4[14] = 0;
 	mat4[15] = 1;
-
-	/* mat4[5] = cos(radian_angle) * axis[0];
-	mat4[6] = sin(radian_angle) * axis[0];
-	mat4[9] = -sin(radian_angle) * axis[0];
-	mat4[10] = cos(radian_angle) * axis[0]; */
-
-	/* mat4[0] = cos(radian_angle) * axis[1];
-	mat4[2] = -sin(radian_angle) * axis[1];
-	mat4[8] = sin(radian_angle) * axis[1];
-	mat4[10] = cos(radian_angle) * axis[1];
-
-	mat4[0] = cos(radian_angle) * axis[2];
-	mat4[1] = sin(radian_angle) * axis[2];
-	mat4[4] = -sin(radian_angle) * axis[2];
-	mat4[5] = cos(radian_angle) * axis[2]; */
 }
 
 static void render_frame(UINT *handles, UINT texture)
@@ -144,26 +94,24 @@ static void render_frame(UINT *handles, UINT texture)
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
 	GLfloat	vec[] = {1.0f, 0.5f, 0.3f};
+	GLfloat	home_model[16];
+	GLfloat *home_view;
+	GLfloat *home_proj;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//create transformations
-	glm::mat4 model = glm::mat4(1.0f);//make sure to initialize matrix to identity matrix first
-	glm::mat4 view = glm::mat4(1.0f);
-	glm::mat4 projection = glm::mat4(1.0f);
-	model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-	GLfloat	*home_model = identity_mat4();
 	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, vec);
-	//compare_matrixes(glm::value_ptr(model), home_model, "model");
-	view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+	home_view = translation_mat4(0, 0, -3);
+	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, glm::radians(45.0f), 0.1f, 100.0f);
 	// pass them to the shaders (3 different ways)
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
-	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
+	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, home_proj);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	free(home_model);
-	loop_nb++;//TO_DELETE
+	free(home_view);
+	free(home_proj);
+	//loop_nb++;//TO_DELETE
 }
 
 /*

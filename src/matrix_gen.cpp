@@ -38,39 +38,3 @@ GLfloat	*translation_mat4(GLfloat t_x, GLfloat t_y, GLfloat t_z)
 	result[14] = t_z;
 	return (result);
 }
-
-GLfloat	*x_rotation_mat4(GLfloat angle)
-{
-	GLfloat	*result;
-
-	result = identity_mat4();
-	result[5] = cos(angle);
-	result[6] = -sin(angle);
-	result[9] = sin(angle);
-	result[9] = cos(angle);
-	return (result);
-}
-
-GLfloat	*y_rotation_mat4(GLfloat angle)
-{
-	GLfloat	*result;
-
-	result = identity_mat4();
-	result[0] = cos(angle);
-	result[2] = sin(angle);
-	result[8] = -sin(angle);
-	result[10] = cos(angle);
-	return (result);
-}
-
-GLfloat	*z_rotation_mat4(GLfloat angle)
-{
-	GLfloat	*result;
-
-	result = identity_mat4();
-	result[0] = cos(angle);
-	result[1] = sin(angle);
-	result[4] = -sin(angle);
-	result[5] = cos(angle);
-	return (result);
-}

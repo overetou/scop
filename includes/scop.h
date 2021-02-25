@@ -66,7 +66,8 @@ GLfloat	dot_product(GLfloat *vec3_1, GLfloat *vec3_2);
 void	free_three(void *adr1, void *adr2, void *adr3);
 void	check_open(int fd);
 void	check_file_format(int *n, unsigned char *header);
-GLfloat	*x_rotation_mat4(GLfloat angle);
 void	normalize_vec3(GLfloat *source, GLfloat *result);
-
+GLfloat	*translation_mat4(GLfloat t_x, GLfloat t_y, GLfloat t_z);
+GLfloat	*perspective_mat4(GLfloat aspect_ratio,
+GLfloat vertical_field_of_view, GLfloat near_limit, GLfloat far_limit);
 #endif
