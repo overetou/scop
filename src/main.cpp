@@ -50,6 +50,25 @@ void handle_events(char *params)
 	}
 }
 
+size_t	loop_nb = 0;
+
+void	compare_matrixes(float *official_mat, float *home_made_mat, const char *mat_name)
+{
+	int i = 0;
+
+	while (i != 16)
+	{
+		if (official_mat[i] != home_made_mat[i])
+		{
+			printf("Mat diff detected on loop %lu, for matrix '%s'.\n", loop_nb, mat_name);
+			exit(0);
+		}
+		i++;
+	}
+	printf("\n");
+	exit(0);
+}
+
 static void render_frame(UINT *handles, UINT texture)
 {
 	const unsigned int SCR_WIDTH = 800;
@@ -59,28 +78,17 @@ static void render_frame(UINT *handles, UINT texture)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//create transformations
 	glm::mat4 model = glm::mat4(1.0f);//make sure to initialize matrix to identity matrix first
-	int i = 0;
-	float *f =glm::value_ptr(model);
-	while (i != 16)
-	{
-		printf("%f ", f[i]);
-		i++;
-	}
-	printf("\n");
-	exit(0);
 	glm::mat4 view		  = glm::mat4(1.0f);
 	glm::mat4 projection	= glm::mat4(1.0f);
 	model = glm::rotate(model, ((float)SDL_GetTicks() / 1000) * glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 1.0f));
 	view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 	projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-	// retrieve the matrix uniform locations
-	unsigned int modelLoc = glGetUniformLocation(handles[3], "model");
-	unsigned int viewLoc  = glGetUniformLocation(handles[3], "view");
 	// pass them to the shaders (3 different ways)
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+	loop_nb++;//TO_DELETE
 }
 
 /*

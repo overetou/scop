@@ -40,6 +40,14 @@
 " vertex_shader_source / fragment_shader_source]"
 //"uniform vec4 fixedColor;"
 
+typedef struct	s_parsing_storage
+{
+	GLfloat		*vert;
+	GLuint		v_nb;
+	GLuint		*v_ind;
+	GLuint		v_ind_size;
+}				t_parsing_storage;
+
 void	process_args(const int argc, const char *argv[]);
 void	error_check(char val, const char *msg);
 void	error_check_gl(GLenum error);
