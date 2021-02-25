@@ -6,6 +6,7 @@
 # include <GL/glew.h>
 # include <math.h>
 # include <stdio.h>
+# include <unistd.h>
 # include <time.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -53,5 +54,19 @@ void	error_check(char val, const char *msg);
 void	error_check_gl(GLenum error);
 void	allocate_graphic_side_objects(UINT *handles);
 void	desallocate_graphic_side_objects(UINT *handles);
+GLfloat	*identity_mat4(void);
+unsigned int	get_file_size(int fd);
+void	try_line_parsing(const char *header, const char *content,
+unsigned int *pos, t_parsing_storage *storage);
+void	check_bmp_file(int fd, int *n, unsigned char *header);
+GLfloat	vector_length(GLfloat *vec3);
+void	cross_product(GLfloat *vec3_1, GLfloat *vec3_2, GLfloat *result);
+void	fill_vec3(GLfloat *vec, GLfloat val1, GLfloat val2, GLfloat val3);
+GLfloat	dot_product(GLfloat *vec3_1, GLfloat *vec3_2);
+void	free_three(void *adr1, void *adr2, void *adr3);
+void	check_open(int fd);
+void	check_file_format(int *n, unsigned char *header);
+GLfloat	*x_rotation_mat4(GLfloat angle);
+void	normalize_vec3(GLfloat *source, GLfloat *result);
 
 #endif
