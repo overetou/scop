@@ -8,9 +8,6 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <time.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -70,4 +67,13 @@ void	normalize_vec3(GLfloat *source, GLfloat *result);
 GLfloat	*translation_mat4(GLfloat t_x, GLfloat t_y, GLfloat t_z);
 GLfloat	*perspective_mat4(GLfloat aspect_ratio,
 GLfloat vertical_field_of_view, GLfloat near_limit, GLfloat far_limit);
+void			load_obj(const char *path, t_parsing_storage *storage);
+void	normalize_obj(t_parsing_storage *storage);
+void	check_vertices_number(t_parsing_storage *storage);
+void	assign_max_min_initial_values(GLfloat *tab, GLfloat val);
+void	determine_tab_diff(GLfloat *tab);
+void	affect_diffs(GLfloat *vertices_sub_tab,
+GLfloat diff1, GLfloat diff2, GLfloat diff3);
+void	do_for_each(GLfloat *tab1, GLfloat *tab2,
+GLfloat *tab3, void (*func)(GLfloat *tab));
 #endif

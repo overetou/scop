@@ -13,7 +13,7 @@ CPPFLAGS=
 LIBS=SDL2 GL GLEW m#m stands for mathlib
 
 #From there we use the info to compile everything.
-SRC_FILE_NAMES = cleaning.cpp main.cpp process_args.cpp gl_buffers.cpp loader.cpp bmp_loader.cpp matrix_basics.cpp matrix_gen.cpp matrix_mult.cpp vectors.cpp
+SRC_FILE_NAMES = cleaning.cpp main.cpp process_args.cpp gl_buffers.cpp loader.cpp bmp_loader.cpp matrix_basics.cpp matrix_gen.cpp matrix_mult.cpp vectors.cpp trio_simplification.cpp
 SOURCES=$(addprefix $(SRC_DIR)/, $(SRC_FILE_NAMES))
 OBJS:=$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 INC_FLAGS=$(addprefix -I,$(INC_DIRS))

@@ -4,3 +4,6 @@ scop
 src/test.c
 container.jpg
 includes/stb_image.h
+.cache/
+compile_commands.json
+cube2.obj

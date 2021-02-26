@@ -1,4 +1,5 @@
 #include "scop.h"
+#include <fcntl.h>
 
 static void check_compilation_step_success(UINT handle,
 void(*getter)(UINT, GLenum, int*), GLenum status)
@@ -22,6 +23,102 @@ const char *shader_source)
 	glCompileShader(*shader_handle);
 	check_compilation_step_success(*shader_handle,	glGetShaderiv,
 	GL_COMPILE_STATUS);
+}
+
+GLfloat	*load_vertices(const char *file_name)
+{
+	size_t	file_size, vert_size = 0, final_vert_size = 0;
+	int fd = open(file_name, O_RDONLY);
+	size_t	i = 0;
+	char	*file_content;
+	GLfloat *vertices = NULL;
+
+	check_open(fd);
+	file_size = get_file_size(fd);
+	//printf("File size = %lu.\n", file_size);
+	file_content = (char*)malloc(file_size + 1);
+	file_content[file_size] = '\0';
+	if (read(fd, file_content, file_size) != file_size)
+	{
+		puts("Unable to read obj file correctly.");
+		exit(0);
+	}
+	GLfloat	*vts = NULL;
+	size_t	len_vts = 0;
+	while (i + 1 < file_size)
+	{
+		if (file_content[i] == 'v' && file_content[i + 1] == ' ')
+		{
+			i += 2;
+			vertices = (GLfloat*)realloc(vertices, (vert_size + 3) * sizeof(GLfloat));
+			if (sscanf(file_content + i, "%f %f %f", vertices + vert_size, vertices + vert_size + 1, vertices + vert_size + 2) != 3)
+			{
+				puts("Unable to parse vertex.");
+				exit(0);
+			}
+//			printf("At vert index: %lu:\n%f, %f, %f\n", vert_size, vertices[vert_size], vertices[vert_size + 1], vertices[vert_size + 2]);
+			vert_size += 3;
+		}
+		else if (i + 2 < file_size && file_content[i] == 'v' && file_content[i + 1] == 't' && file_content[i + 2] == ' ')
+		{
+			i += 3;
+			vts = (GLfloat*)realloc(vts, (len_vts + 2) * sizeof(GLfloat));
+			sscanf(file_content + i, "%f %f", vts + len_vts, vts + len_vts + 1);
+			len_vts += 2;
+		}
+		while (i != file_size && file_content[i++] != '\n');
+	}
+	i = 0;
+	GLfloat	*final_vertices = NULL;
+	int index, vt_index;
+	while (i + 1 < file_size)
+	{
+		if (file_content[i] == 'f' && file_content[i + 1] == ' ')
+		{
+			i += 2;
+			final_vertices = (GLfloat*)realloc(final_vertices, (final_vert_size + 15) * sizeof(GLfloat));
+
+			sscanf(file_content + i, "%i/%i", &index, &vt_index);
+			final_vertices[final_vert_size] = vertices[(index - 1) * 3];
+			final_vertices[final_vert_size + 1] = vertices[(index - 1) * 3 + 1];
+			final_vertices[final_vert_size + 2] = vertices[(index - 1) * 3 + 2];
+			final_vertices[final_vert_size + 3] = vts[(vt_index - 1) * 2];
+			final_vertices[final_vert_size + 4] = vts[(vt_index - 1) * 2 + 1];
+
+			while(i != file_size && file_content[i++] != ' ');
+
+			sscanf(file_content + i, "%i/%i", &index, &vt_index);
+			final_vertices[final_vert_size + 5] = vertices[(index - 1) * 3];
+			final_vertices[final_vert_size + 6] = vertices[(index - 1) * 3 + 1];
+			final_vertices[final_vert_size + 7] = vertices[(index - 1) * 3 + 2];
+			final_vertices[final_vert_size + 8] = vts[(vt_index - 1) * 2];
+			final_vertices[final_vert_size + 9] = vts[(vt_index - 1) * 2 + 1];
+
+			while(i != file_size && file_content[i++] != ' ');
+
+			sscanf(file_content + i, "%i/%i", &index, &vt_index);
+			final_vertices[final_vert_size + 10] = vertices[(index - 1) * 3];
+			final_vertices[final_vert_size + 11] = vertices[(index - 1) * 3 + 1];
+			final_vertices[final_vert_size + 12] = vertices[(index - 1) * 3 + 2];
+			final_vertices[final_vert_size + 13] = vts[(vt_index - 1) * 2];
+			final_vertices[final_vert_size + 14] = vts[(vt_index - 1) * 2 + 1];
+
+			final_vert_size += 15;
+		}
+		while(i != file_size && file_content[i++] != '\n');
+	}
+	i = 0;
+	while(i != final_vert_size)
+	{
+		printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
+		i += 5;
+	}
+	free(file_content);
+	if (vertices)
+		free(vertices);
+	if (vts)
+		free(vts);
+	return (final_vertices);
 }
 
 /*
@@ -77,17 +174,16 @@ void	allocate_graphic_side_objects(UINT *handles)
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
-	/* unsigned int indices[] = {  
-		0, 1, 3, // first triangle
-		1, 2, 3  // second triangle
-	}; */
+	free(load_vertices("cube2.obj"));
 
+	GLfloat *home_vertices = load_vertices("cube2.obj");
 	glGenVertexArrays(1, handles + 4);
 	glGenBuffers(1, handles);
 	//glGenBuffers(1, handles + 5);
 	glBindVertexArray(handles[4]);
 	glBindBuffer(GL_ARRAY_BUFFER, *handles);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), home_vertices, GL_STATIC_DRAW);
+	free(home_vertices);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handles[5]);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	compile_shader(GL_VERTEX_SHADER, handles + 1, VERTEX_SHADER_SOURCE);

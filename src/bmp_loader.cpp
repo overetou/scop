@@ -102,3 +102,17 @@ void	load_bmp_from_filename(const char *path)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
+
+void			load_obj(const char *path, t_parsing_storage *storage)
+{
+	int				fd;
+
+	fd = open(path, O_RDONLY);
+	if (fd != -1)
+		do_obj_parsing(fd, storage, 0);
+	else
+	{
+		puts("could not open the given obj file.");
+		exit(0);
+	}
+}
