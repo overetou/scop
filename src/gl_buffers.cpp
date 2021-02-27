@@ -25,7 +25,7 @@ const char *shader_source)
 	GL_COMPILE_STATUS);
 }
 
-GLfloat	*load_vertices(const char *file_name)
+GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 {
 	size_t	file_size, vert_size = 0, final_vert_size = 0;
 	int fd = open(file_name, O_RDONLY);
@@ -113,6 +113,7 @@ GLfloat	*load_vertices(const char *file_name)
 		printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
 		i += 5;
 	}
+	*vertices_len = final_vert_size;
 	free(file_content);
 	if (vertices)
 		free(vertices);
@@ -174,15 +175,15 @@ void	allocate_graphic_side_objects(UINT *handles)
     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
-	free(load_vertices("cube2.obj"));
 
-	GLfloat *home_vertices = load_vertices("cube2.obj");
+	size_t	vertices_len;
+	GLfloat *home_vertices = load_vertices("cube2.obj", &vertices_len);
 	glGenVertexArrays(1, handles + 4);
 	glGenBuffers(1, handles);
 	//glGenBuffers(1, handles + 5);
 	glBindVertexArray(handles[4]);
 	glBindBuffer(GL_ARRAY_BUFFER, *handles);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), home_vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices_len * sizeof(GLfloat), home_vertices, GL_STATIC_DRAW);
 	free(home_vertices);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handles[5]);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
