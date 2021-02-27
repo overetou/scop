@@ -89,7 +89,7 @@ void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 	mat4[15] = 1;
 }
 
-static void render_frame(UINT *handles, UINT texture)
+static void render_frame(UINT *handles, UINT texture, size_t len)
 {
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
@@ -108,7 +108,7 @@ static void render_frame(UINT *handles, UINT texture)
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, home_proj);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glDrawArrays(GL_TRIANGLES, 0, len);
 	free(home_view);
 	free(home_proj);
 	//loop_nb++;//TO_DELETE
@@ -132,7 +132,7 @@ void init_render(SDL_Window *win)
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClearColor(0.3, 0.3, 0.3, 1);
 	glEnable(GL_DEPTH_TEST);
-	allocate_graphic_side_objects(handles);
+	size_t len = allocate_graphic_side_objects(handles);
 	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
 	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
 	
@@ -149,7 +149,7 @@ void init_render(SDL_Window *win)
 	// load image, create texture and generate mipmaps
 	int width, height, nrChannels;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+	unsigned char *data = load_bmp_from_filename("cat.bmp");
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -161,7 +161,7 @@ void init_render(SDL_Window *win)
 
 	while (params[0])
 	{
-		render_frame(handles, texture);
+		render_frame(handles, texture, len);
 		SDL_GL_SwapWindow(win);
 		handle_events(params);
 	}

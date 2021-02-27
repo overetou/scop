@@ -46,6 +46,6 @@ void		process_args(const int argc, const char *argv[])
 			puts("No match for given argument." USAGE);
 		exit(0);
 	}
-	error_check(argc == 3, "Wrong number of arguments." USAGE);
+	error_check(argc == 3, USAGE);
 	
 }

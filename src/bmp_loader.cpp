@@ -61,7 +61,7 @@ void	check_file_format(int *n, unsigned char *header)
 	}
 }
 
-void	check_image_correct_read(int *n, char *image)
+void	check_image_correct_read(int *n, unsigned char *image)
 {
 	if (read(n[4], image, n[3]) != n[3])
 	{
@@ -74,11 +74,11 @@ void	check_image_correct_read(int *n, char *image)
 **n[0] = data_pos, n[1] = width, n[2] = height, n[3] = image_size, n[4] = fd
 */
 
-void	load_bmp_from_filename(const char *path)
+unsigned char	*load_bmp_from_filename(const char *path)
 {
 	unsigned char	header[54];
 	int				n[5];
-	char			*image;
+	unsigned char			*image;
 	GLuint			texture_name;
 
 	n[4] = open(path, O_RDONLY);
@@ -91,16 +91,17 @@ void	load_bmp_from_filename(const char *path)
 		n[3] = n[1] * n[2];
 	if (n[0] == 0)
 		n[0] = 54;
-	image = (char*)malloc(sizeof(char) * n[3]);
+	image = (unsigned char*)malloc(sizeof(char) * n[3]);
 	check_image_correct_read(n, image);
-	close(n[4]);
+	/*close(n[4]);
 	glGenTextures(1, &texture_name);
 	glBindTexture(GL_TEXTURE_2D, texture_name);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, n[1], n[2], 0, GL_BGR,
 				GL_UNSIGNED_BYTE, image);
 	free(image);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);*/
+	return image;
 }
 
 void			load_obj(const char *path, t_parsing_storage *storage)

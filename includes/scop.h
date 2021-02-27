@@ -13,26 +13,26 @@
 #define WINDOW_HEIGHT 600
 #define UINT unsigned int
 #define VERTEX_SHADER_SOURCE "#version 440 core\n"\
-"layout (location = 0) in vec3 aPos;"\
-"layout (location = 1) in vec2 aTexCoord;"\
-"uniform mat4 model;"\
-"uniform mat4 view;"\
-"uniform mat4 projection;"\
-"out vec2 TexCoord;"\
-"void main()"\
-"{"\
-"	gl_Position = projection * view * model * vec4(aPos, 1.0);"\
-"	TexCoord = aTexCoord;"\
-"}"
+"layout (location = 0) in vec3 aPos;\n"\
+"layout (location = 1) in vec2 aTexCoord;\n"\
+"uniform mat4 model;\n"\
+"uniform mat4 view;\n"\
+"uniform mat4 projection;\n"\
+"out vec2 TexCoord;\n"\
+"void main()\n"\
+"{\n"\
+"	gl_Position = projection * view * model * vec4(aPos, 1.0);\n"\
+"	TexCoord = aTexCoord;\n"\
+"}\n"
 
 #define FRAGMENT_SHADER_SOURCE "#version 440 core\n"\
-"in vec2 TexCoord;"\
-"out vec4 FragColor;"\
-"uniform sampler2D ourTexture;"\
-"void main()"\
-"{"\
-"    FragColor = texture(ourTexture, TexCoord);"\
-"}"
+"in vec2 TexCoord;\n"\
+"out vec4 FragColor;\n"\
+"uniform sampler2D ourTexture;\n"\
+"void main()\n"\
+"{\n"\
+"    FragColor = texture(ourTexture, TexCoord);\n"\
+"}\n"
 #define USAGE "Wrong number of arguments.\nUsage:\t./scop"\
 " <file>.obj <file>.bmp\n\tOr\n\t./scop [specs /"\
 " vertex_shader_source / fragment_shader_source]"
@@ -49,7 +49,7 @@ typedef struct	s_parsing_storage
 void	process_args(const int argc, const char *argv[]);
 void	error_check(char val, const char *msg);
 void	error_check_gl(GLenum error);
-void	allocate_graphic_side_objects(UINT *handles);
+size_t	allocate_graphic_side_objects(UINT *handles);
 void	desallocate_graphic_side_objects(UINT *handles);
 GLfloat	*identity_mat4(void);
 unsigned int	get_file_size(int fd);
@@ -76,4 +76,5 @@ void	affect_diffs(GLfloat *vertices_sub_tab,
 GLfloat diff1, GLfloat diff2, GLfloat diff3);
 void	do_for_each(GLfloat *tab1, GLfloat *tab2,
 GLfloat *tab3, void (*func)(GLfloat *tab));
+unsigned char	*load_bmp_from_filename(const char *path);
 #endif
