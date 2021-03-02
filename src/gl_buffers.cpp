@@ -33,17 +33,24 @@ size_t *text_coord_nb)
 	int vt_index;
 
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
+	printf("v pos: %d.\n", index);
 	final_vertices[*final_vert_size] = vertices[(index - 1) * 3];
-	final_vertices[*final_vert_size + 1] = vertices[(index - 1) * 3 + 1];
-	final_vertices[*final_vert_size + 2] = vertices[(index - 1) * 3 + 2];
-	while (*i != file_size && file_content[*i] != ' ' && file_content[(*i)++] != '/');
-	if (*i != file_size && file_content[(*i) - 1] == '/')
+	final_vertices[(*final_vert_size) + 1] = vertices[(index - 1) * 3 + 1];
+	final_vertices[(*final_vert_size) + 2] = vertices[(index - 1) * 3 + 2];
+	while (*i < file_size && file_content[*i] != ' ' && file_content[*i] != '/')
+		(*i)++;
+	(*i)++;
+	if (*i < file_size && file_content[(*i) - 1] == '/')
 	{
-		error_check(sscanf(file_content + (*i),"/%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
-		final_vertices[*final_vert_size + 3] = vts[(vt_index - 1) * 2];
-		final_vertices[*final_vert_size + 4] = vts[(vt_index - 1) * 2 + 1];
+		error_check(sscanf(file_content + (*i),"%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
+		printf("vt pos: %d.\n", vt_index);
+		final_vertices[(*final_vert_size) + 3] = vts[(vt_index - 1) * 2];
+		final_vertices[(*final_vert_size) + 4] = vts[(vt_index - 1) * 2 + 1];
 		(*text_coord_nb)++;
-		while(*i != file_size && (file_content[*i] != ' ' || file_content[(*i)++] != '\n'));
+		while(*i != file_size && file_content[*i] != ' ' && file_content[*i] != '\n')
+			(*i)++;
+		(*i)++;
+		printf("cursor is now on '%c'.\n", file_content[*i]);
 	}
 	*final_vert_size += 5;
 }
@@ -111,11 +118,11 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		while(i != file_size && file_content[i++] != '\n');
 	}
 	i = 0;
-	/* while(i != final_vert_size)
+	while(i != final_vert_size)
 	{
-		printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
+		//printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
 		i += 5;
-	} */
+	}
 	*vertices_len = final_vert_size;
 	free(file_content);
 	if (vertices)
@@ -136,7 +143,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 size_t	allocate_graphic_side_objects(UINT *handles)
 {
 	size_t	vertices_len;
-	GLfloat *home_vertices = load_vertices("42.obj", &vertices_len);
+	GLfloat *home_vertices = load_vertices("cube2.obj", &vertices_len);
 	glGenVertexArrays(1, handles + 4);
 	glGenBuffers(1, handles);
 	//glGenBuffers(1, handles + 5);
