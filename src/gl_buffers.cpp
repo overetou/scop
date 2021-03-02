@@ -78,16 +78,20 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 			i += 2;
 			final_vertices = (GLfloat*)realloc(final_vertices, (final_vert_size + 15) * sizeof(GLfloat));
 
-			sscanf(file_content + i, "%i", &index, &vt_index);
+			error_check(sscanf(file_content + i, "%i", &index) == 1, "Wrong obj file format.");
 			final_vertices[final_vert_size] = vertices[(index - 1) * 3];
 			final_vertices[final_vert_size + 1] = vertices[(index - 1) * 3 + 1];
 			final_vertices[final_vert_size + 2] = vertices[(index - 1) * 3 + 2];
-			//final_vertices[final_vert_size + 3] = vts[(vt_index - 1) * 2];
-			//final_vertices[final_vert_size + 4] = vts[(vt_index - 1) * 2 + 1];
+			while(i != file_size && file_content[i] != ' ' && file_content[i++] != '/');
+			if ( i != file_size && file_content[i - 1] == '/')
+			{
+				error_check(scanf("/%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
+				final_vertices[final_vert_size + 3] = vts[(vt_index - 1) * 2];
+				final_vertices[final_vert_size + 4] = vts[(vt_index - 1) * 2 + 1];
+			}
 
-			while(i != file_size && file_content[i++] != ' ');
 
-			sscanf(file_content + i, "%i", &index, &vt_index);
+			sscanf(file_content + i, "%i", &index);
 			final_vertices[final_vert_size + 5] = vertices[(index - 1) * 3];
 			final_vertices[final_vert_size + 6] = vertices[(index - 1) * 3 + 1];
 			final_vertices[final_vert_size + 7] = vertices[(index - 1) * 3 + 2];
@@ -96,7 +100,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 
 			while(i != file_size && file_content[i++] != ' ');
 
-			sscanf(file_content + i, "%i", &index, &vt_index);
+			sscanf(file_content + i, "%i", &index);
 			final_vertices[final_vert_size + 10] = vertices[(index - 1) * 3];
 			final_vertices[final_vert_size + 11] = vertices[(index - 1) * 3 + 1];
 			final_vertices[final_vert_size + 12] = vertices[(index - 1) * 3 + 2];
