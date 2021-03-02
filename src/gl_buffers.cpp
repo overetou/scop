@@ -32,6 +32,7 @@ size_t *text_coord_nb)
 	int index;
 	int vt_index;
 
+	final_vertices = (GLfloat*)realloc(final_vertices, (final_vert_size + 15) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
 	printf("v pos: %d.\n", index);
 	final_vertices[*final_vert_size] = vertices[(index - 1) * 3];
@@ -54,6 +55,22 @@ size_t *text_coord_nb)
 	}
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
+	*final_vert_size += 5;
+}
+
+void	handle_fourth_face(const char *file_content, size_t *i, GLfloat *final_vertices,
+const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
+size_t *text_coord_nb)
+{
+	final_vertices = (GLfloat*)realloc(final_vertices, (final_vert_size + 10) * sizeof(GLfloat));
+	final_vertices[*final_vert_size] = final_vertices[(*final_vert_size) - 9];
+	final_vertices[(*final_vert_size) + 1] = final_vertices[(*final_vert_size) - 8];
+	final_vertices[(*final_vert_size) + 2] = final_vertices[(*final_vert_size) - 7];
+	final_vertices[(*final_vert_size) + 3] = final_vertices[(*final_vert_size) - 3];
+	final_vertices[(*final_vert_size) + 4] = final_vertices[(*final_vert_size) - 2];
+	final_vertices[(*final_vert_size) + 5] = final_vertices[(*final_vert_size) - 1];
+	*final_vert_size += 10;
+	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, text_coord_nb);
 	*final_vert_size += 5;
 }
 
@@ -109,13 +126,14 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		if (file_content[i] == 'f' && file_content[i + 1] == ' ')
 		{
 			i += 2;
-			final_vertices = (GLfloat*)realloc(final_vertices, (final_vert_size + 15) * sizeof(GLfloat));
 			parse_face_point(file_content, &i, final_vertices, vertices, vts, file_size,
 			&final_vert_size, &text_coord_nb);
 			parse_face_point(file_content, &i, final_vertices, vertices, vts, file_size,
 			&final_vert_size, &text_coord_nb);
 			parse_face_point(file_content, &i, final_vertices, vertices, vts, file_size,
 			&final_vert_size, &text_coord_nb);
+			if (i < file_size && file_content[i] != '\n')
+				handle_fourth_face();
 		}
 		while(i != file_size && file_content[i++] != '\n');
 	}
