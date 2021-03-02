@@ -131,7 +131,6 @@ void init_render(SDL_Window *win)
 	params[1] = 0;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClearColor(0.3, 0.3, 0.3, 1);
-	glEnable(GL_DEPTH_TEST);
 	size_t len = allocate_graphic_side_objects(handles);
 	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
 	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
@@ -149,7 +148,7 @@ void init_render(SDL_Window *win)
 	// load image, create texture and generate mipmaps
 	int width, height, nrChannels;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char *data = load_bmp_from_filename("cat.bmp");
+	unsigned char *data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -158,7 +157,7 @@ void init_render(SDL_Window *win)
 	else
 		puts("Failed to load texture");
 	stbi_image_free(data);
-
+	glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
 	while (params[0])
 	{
 		render_frame(handles, texture, len);

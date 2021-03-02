@@ -31,7 +31,7 @@
 "uniform sampler2D ourTexture;\n"\
 "void main()\n"\
 "{\n"\
-"    FragColor = texture(ourTexture, TexCoord);\n"\
+"    FragColor = vec4(0, 0.4, 0.4, 1);\n"\
 "}\n"
 #define USAGE "Wrong number of arguments.\nUsage:\t./scop"\
 " <file>.obj <file>.bmp\n\tOr\n\t./scop [specs /"\
