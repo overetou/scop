@@ -25,8 +25,9 @@ const char *shader_source)
 	GL_COMPILE_STATUS);
 }
 
-void	parse_face_point(const char *file_content, int *i, GLfloat *final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size)
+void	parse_face_point(const char *file_content, size_t *i, GLfloat *final_vertices,
+const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
+size_t *text_coord_nb)
 {
 	int index;
 	int vt_index;
@@ -35,13 +36,16 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 	final_vertices[*final_vert_size] = vertices[(index - 1) * 3];
 	final_vertices[*final_vert_size + 1] = vertices[(index - 1) * 3 + 1];
 	final_vertices[*final_vert_size + 2] = vertices[(index - 1) * 3 + 2];
-	while(*i != file_size && file_content[*i] != ' ' && file_content[(*i)++] != '/');
+	while (*i != file_size && file_content[*i] != ' ' && file_content[(*i)++] != '/');
 	if (*i != file_size && file_content[(*i) - 1] == '/')
 	{
 		error_check(sscanf(file_content + (*i),"/%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
 		final_vertices[*final_vert_size + 3] = vts[(vt_index - 1) * 2];
 		final_vertices[*final_vert_size + 4] = vts[(vt_index - 1) * 2 + 1];
+		(*text_coord_nb)++;
+		while(*i != file_size && (file_content[*i] != ' ' || file_content[(*i)++] != '\n'));
 	}
+	*final_vert_size += 5;
 }
 
 GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
@@ -51,6 +55,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	size_t	i = 0;
 	char	*file_content;
 	GLfloat *vertices = NULL;
+	size_t	text_coord_nb = 0;//Keeps count of the number of point that gave their texture coordinates.
 
 	check_open(fd);
 	file_size = get_file_size(fd);
@@ -96,24 +101,12 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		{
 			i += 2;
 			final_vertices = (GLfloat*)realloc(final_vertices, (final_vert_size + 15) * sizeof(GLfloat));
-
-			sscanf(file_content + i, "%i", &index);
-			final_vertices[final_vert_size + 5] = vertices[(index - 1) * 3];
-			final_vertices[final_vert_size + 6] = vertices[(index - 1) * 3 + 1];
-			final_vertices[final_vert_size + 7] = vertices[(index - 1) * 3 + 2];
-			//final_vertices[final_vert_size + 8] = vts[(vt_index - 1) * 2];
-			//final_vertices[final_vert_size + 9] = vts[(vt_index - 1) * 2 + 1];
-
-			while(i != file_size && file_content[i++] != ' ');
-
-			sscanf(file_content + i, "%i", &index);
-			final_vertices[final_vert_size + 10] = vertices[(index - 1) * 3];
-			final_vertices[final_vert_size + 11] = vertices[(index - 1) * 3 + 1];
-			final_vertices[final_vert_size + 12] = vertices[(index - 1) * 3 + 2];
-			//final_vertices[final_vert_size + 13] = vts[(vt_index - 1) * 2];
-			//final_vertices[final_vert_size + 14] = vts[(vt_index - 1) * 2 + 1];
-
-			final_vert_size += 15;
+			parse_face_point(file_content, &i, final_vertices, vertices, vts, file_size,
+			&final_vert_size, &text_coord_nb);
+			parse_face_point(file_content, &i, final_vertices, vertices, vts, file_size,
+			&final_vert_size, &text_coord_nb);
+			parse_face_point(file_content, &i, final_vertices, vertices, vts, file_size,
+			&final_vert_size, &text_coord_nb);
 		}
 		while(i != file_size && file_content[i++] != '\n');
 	}
