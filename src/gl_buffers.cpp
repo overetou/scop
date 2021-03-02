@@ -37,7 +37,7 @@ size_t *text_coord_nb)
 	final_vertices[*final_vert_size] = vertices[(index - 1) * 3];
 	final_vertices[(*final_vert_size) + 1] = vertices[(index - 1) * 3 + 1];
 	final_vertices[(*final_vert_size) + 2] = vertices[(index - 1) * 3 + 2];
-	while (*i < file_size && file_content[*i] != ' ' && file_content[*i] != '/')
+	while (*i < file_size && file_content[*i] != ' ' && file_content[*i] != '/' && file_content[*i] != '\n')
 		(*i)++;
 	(*i)++;
 	if (*i < file_size && file_content[(*i) - 1] == '/')
@@ -52,6 +52,8 @@ size_t *text_coord_nb)
 		(*i)++;
 		printf("cursor is now on '%c'.\n", file_content[*i]);
 	}
+	if (*i < file_size && file_content[(*i) - 1] == '\n')
+		(*i)--;
 	*final_vert_size += 5;
 }
 
