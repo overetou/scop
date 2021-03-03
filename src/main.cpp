@@ -131,7 +131,7 @@ void init_render(t_master *m)
 	params[1] = 0;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	glClearColor(0.3, 0.3, 0.3, 1);
-	size_t len = allocate_graphic_side_objects(handles);
+	size_t len = allocate_graphic_side_objects(handles, m);
 	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
 	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
 	

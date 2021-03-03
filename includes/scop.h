@@ -41,8 +41,8 @@
 typedef struct	s_master
 {
 	SDL_Window	*win;
-	char		*obj_file_path;
-	char		*text_file_path;
+	const char	*obj_file_path;
+	const char	*text_file_path;
 }				t_master;
 
 typedef struct	s_parsing_storage
@@ -56,7 +56,7 @@ typedef struct	s_parsing_storage
 void	process_args(const int argc, const char *argv[], t_master *m);
 void	error_check(char val, const char *msg);
 void	error_check_gl(GLenum error);
-size_t	allocate_graphic_side_objects(UINT *handles);
+size_t	allocate_graphic_side_objects(UINT *handles, t_master *m);
 void	desallocate_graphic_side_objects(UINT *handles);
 GLfloat	*identity_mat4(void);
 unsigned int	get_file_size(int fd);

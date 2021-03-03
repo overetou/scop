@@ -34,7 +34,7 @@ size_t *text_coord_nb)
 
 	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 5) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
-	printf("v pos: %d read at index %lu.\n", index, *i);
+	//printf("v pos: %d read at index %lu.\n", index, *i);
 	(*final_vertices)[*final_vert_size] = vertices[(index - 1) * 3];
 	(*final_vertices)[(*final_vert_size) + 1] = vertices[(index - 1) * 3 + 1];
 	(*final_vertices)[(*final_vert_size) + 2] = vertices[(index - 1) * 3 + 2];
@@ -44,7 +44,7 @@ size_t *text_coord_nb)
 	if (*i < file_size && file_content[(*i) - 1] == '/')
 	{
 		error_check(sscanf(file_content + (*i),"%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
-		printf("vt pos: %d.\n", vt_index);
+		//printf("vt pos: %d.\n", vt_index);
 		(*final_vertices)[(*final_vert_size) + 3] = vts[(vt_index - 1) * 2];
 		(*final_vertices)[(*final_vert_size) + 4] = vts[(vt_index - 1) * 2 + 1];
 		(*text_coord_nb)++;
@@ -52,7 +52,7 @@ size_t *text_coord_nb)
 			(*i)++;
 		(*i)++;
 	}
-	printf("cursor is now on '%c'.\n", file_content[*i]);
+	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
 	*final_vert_size += 5;
@@ -66,14 +66,14 @@ size_t *text_coord_nb)
 	(*final_vertices)[*final_vert_size] = (*final_vertices)[(*final_vert_size) - 15];
 	(*final_vertices)[(*final_vert_size) + 1] = (*final_vertices)[(*final_vert_size) - 14];
 	(*final_vertices)[(*final_vert_size) + 2] = (*final_vertices)[(*final_vert_size) - 13];
-	printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
-(*final_vertices)[*final_vert_size], (*final_vertices)[(*final_vert_size) + 1], (*final_vertices)[(*final_vert_size) + 2]);
+	//printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
+//(*final_vertices)[*final_vert_size], (*final_vertices)[(*final_vert_size) + 1], (*final_vertices)[(*final_vert_size) + 2]);
 	(*final_vertices)[(*final_vert_size) + 5] = (*final_vertices)[(*final_vert_size) - 5];
 	(*final_vertices)[(*final_vert_size) + 6] = (*final_vertices)[(*final_vert_size) - 4];
 	(*final_vertices)[(*final_vert_size) + 7] = (*final_vertices)[(*final_vert_size) - 3];
-	printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
+	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 10;
-	puts("The next given vertex info will be the fourth point of the face.");
+	//puts("The next given vertex info will be the fourth point of the face.");
 	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, text_coord_nb);
 }
 
@@ -169,10 +169,10 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 **will be set only one time, but used many times.
 **glVertexAttribPointer: a function used to configure the vertex shader argse.
 */
-size_t	allocate_graphic_side_objects(UINT *handles)
+size_t	allocate_graphic_side_objects(UINT *handles, t_master *m)
 {
 	size_t	vertices_len;
-	GLfloat *home_vertices = load_vertices("42.obj", &vertices_len);
+	GLfloat *home_vertices = load_vertices(m->obj_file_path, &vertices_len);
 	glGenVertexArrays(1, handles + 4);
 	glGenBuffers(1, handles);
 	//glGenBuffers(1, handles + 5);

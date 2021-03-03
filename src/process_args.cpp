@@ -31,7 +31,13 @@ static char	str_cmp_n(const char *s1, const char *s2, int len1, int len2)
 
 void		check_and_fill_args(const int argc, const char *argv[], t_master *m)
 {
+	size_t	len;
 
+	len = str_len(argv[1]);
+	error_check(argv[1][len - 1] == 'j' &&
+	argv[1][len - 2] == 'b' && argv[1][len - 3] == 'o' &&
+	argv[1][len - 4] == '.', "Expected a file with the extension '.obj' as first argument.");
+	m->obj_file_path = argv[1];
 }
 
 void		process_args(const int argc, const char *argv[], t_master *m)
