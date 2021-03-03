@@ -34,7 +34,7 @@ size_t *text_coord_nb)
 
 	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 5) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
-	printf("v pos: %d.\n", index);
+	printf("v pos: %d read at index %lu.\n", index, *i);
 	(*final_vertices)[*final_vert_size] = vertices[(index - 1) * 3];
 	(*final_vertices)[(*final_vert_size) + 1] = vertices[(index - 1) * 3 + 1];
 	(*final_vertices)[(*final_vert_size) + 2] = vertices[(index - 1) * 3 + 2];
@@ -51,8 +51,8 @@ size_t *text_coord_nb)
 		while(*i != file_size && file_content[*i] != ' ' && file_content[*i] != '\n')
 			(*i)++;
 		(*i)++;
-		printf("cursor is now on '%c'.\n", file_content[*i]);
 	}
+	printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
 	*final_vert_size += 5;
@@ -63,18 +63,23 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 size_t *text_coord_nb)
 {
 	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 10) * sizeof(GLfloat));
-	(*final_vertices)[*final_vert_size] = (*final_vertices)[(*final_vert_size) - 9];
-	(*final_vertices)[(*final_vert_size) + 1] = (*final_vertices)[(*final_vert_size) - 8];
-	(*final_vertices)[(*final_vert_size) + 2] = (*final_vertices)[(*final_vert_size) - 7];
-	printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) - 9], (*final_vertices)[(*final_vert_size) - 8], (*final_vertices)[(*final_vert_size) - 7]);
-	(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[(*final_vert_size) - 3];
-	(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) - 2];
-	(*final_vertices)[(*final_vert_size) + 5] = (*final_vertices)[(*final_vert_size) - 1];
-	printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) - 3], final_vertices[(*final_vert_size) - 2], final_vertices[(*final_vert_size) - 1]);
+	(*final_vertices)[*final_vert_size] = (*final_vertices)[(*final_vert_size) - 15];
+	(*final_vertices)[(*final_vert_size) + 1] = (*final_vertices)[(*final_vert_size) - 14];
+	(*final_vertices)[(*final_vert_size) + 2] = (*final_vertices)[(*final_vert_size) - 13];
+	printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
+(*final_vertices)[*final_vert_size], (*final_vertices)[(*final_vert_size) + 1], (*final_vertices)[(*final_vert_size) + 2]);
+	(*final_vertices)[(*final_vert_size) + 5] = (*final_vertices)[(*final_vert_size) - 5];
+	(*final_vertices)[(*final_vert_size) + 6] = (*final_vertices)[(*final_vert_size) - 4];
+	(*final_vertices)[(*final_vert_size) + 7] = (*final_vertices)[(*final_vert_size) - 3];
+	printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 10;
 	puts("The next given vertex info will be the fourth point of the face.");
 	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, text_coord_nb);
-	*final_vert_size += 5;
+}
+
+char	is_digit(const char c)
+{
+	return (c >= '0' && c <= '9');
 }
 
 GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
@@ -135,9 +140,9 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 			&final_vert_size, &text_coord_nb);
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
 			&final_vert_size, &text_coord_nb);
-			//if (i < file_size && file_content[i] == ' ')
-			//	handle_fourth_face(file_content, &i, final_vertices, vertices, vts, file_size,
-			//&final_vert_size, &text_coord_nb);
+			if (i < file_size && is_digit(file_content[i]))
+				handle_fourth_face(file_content, &i, &final_vertices, vertices, vts, file_size,
+			&final_vert_size, &text_coord_nb);
 		}
 		while(i != file_size && file_content[i++] != '\n');
 	}
@@ -167,7 +172,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 size_t	allocate_graphic_side_objects(UINT *handles)
 {
 	size_t	vertices_len;
-	GLfloat *home_vertices = load_vertices("cube2.obj", &vertices_len);
+	GLfloat *home_vertices = load_vertices("42.obj", &vertices_len);
 	glGenVertexArrays(1, handles + 4);
 	glGenBuffers(1, handles);
 	//glGenBuffers(1, handles + 5);
