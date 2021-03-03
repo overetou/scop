@@ -152,6 +152,10 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		//printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
 		i += 5;
 	}
+	if (text_coord_nb == final_vert_size / 5)
+		puts("texture coordinates seem to have been correctly given.");
+	else
+		puts("Texture coordinates absents or incomplete.");
 	*vertices_len = final_vert_size;
 	free(file_content);
 	if (vertices)
