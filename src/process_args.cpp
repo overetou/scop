@@ -29,11 +29,16 @@ static char	str_cmp_n(const char *s1, const char *s2, int len1, int len2)
 	return (1);
 }
 
-void		process_args(const int argc, const char *argv[])
+void		check_and_fill_args(const int argc, const char *argv[], t_master *m)
+{
+
+}
+
+void		process_args(const int argc, const char *argv[], t_master *m)
 {
 	int len;
 
-	if (argc ==	2)
+	if (argc == 2)
 	{
 		len = str_len(argv[1]);
 		if (str_cmp_n("specs", argv[1], 5, len))
@@ -47,5 +52,5 @@ void		process_args(const int argc, const char *argv[])
 		exit(0);
 	}
 	error_check(argc == 3, USAGE);
-	
+	check_and_fill_args(argc, argv, m);
 }

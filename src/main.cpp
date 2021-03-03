@@ -121,7 +121,7 @@ static void render_frame(UINT *handles, UINT texture, size_t len)
 **params[0] = keep_going
 **params[1] = wireframe mode enabled
 */
-void init_render(SDL_Window *win)
+void init_render(t_master *m)
 {
 	UINT handles[6];
 	char params[2];
@@ -161,7 +161,7 @@ void init_render(SDL_Window *win)
 	while (params[0])
 	{
 		render_frame(handles, texture, len);
-		SDL_GL_SwapWindow(win);
+		SDL_GL_SwapWindow(m->win);
 		handle_events(params);
 	}
 	desallocate_graphic_side_objects(handles);
@@ -169,7 +169,7 @@ void init_render(SDL_Window *win)
 
 int			main(int argc, char const *argv[])
 {
-	SDL_Window		*win;
+	t_master		m;
 	SDL_GLContext	glcontext;
 
 	error_check_sdl(SDL_Init(SDL_INIT_VIDEO) >= 0);
@@ -179,18 +179,18 @@ int			main(int argc, char const *argv[])
 	error_check_sdl(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
 	SDL_GL_CONTEXT_PROFILE_CORE) == 0);
 	error_check_sdl(SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1) == 0);
-	win = SDL_CreateWindow("Scop", SDL_WINDOWPOS_CENTERED,
+	m.win = SDL_CreateWindow("Scop", SDL_WINDOWPOS_CENTERED,
 	SDL_WINDOWPOS_CENTERED,	WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
-	error_check_sdl(win != NULL);
-	glcontext = SDL_GL_CreateContext(win);
+	error_check_sdl(m.win != NULL);
+	glcontext = SDL_GL_CreateContext(m.win);
 	error_check_sdl(glcontext != NULL);
-	SDL_GL_MakeCurrent(win, glcontext);
+	SDL_GL_MakeCurrent(m.win, glcontext);
 	error_check_sdl(SDL_GL_SetSwapInterval(1) == 0);
 	error_check(glewInit() == GLEW_OK, "Failed to load OpenGL Functions.");
-	process_args(argc, argv);
-	init_render(win);
+	process_args(argc, argv, &m);
+	init_render(&m);
 	SDL_GL_DeleteContext(glcontext);
-	SDL_DestroyWindow(win);
+	SDL_DestroyWindow(m.win);
 	SDL_Quit();
 	return 0;
 }

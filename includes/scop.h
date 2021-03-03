@@ -38,6 +38,13 @@
 " vertex_shader_source / fragment_shader_source]"
 //"uniform vec4 fixedColor;"
 
+typedef struct	s_master
+{
+	SDL_Window	*win;
+	char		*obj_file_path;
+	char		*text_file_path;
+}				t_master;
+
 typedef struct	s_parsing_storage
 {
 	GLfloat		*vert;
@@ -46,7 +53,7 @@ typedef struct	s_parsing_storage
 	GLuint		v_ind_size;
 }				t_parsing_storage;
 
-void	process_args(const int argc, const char *argv[]);
+void	process_args(const int argc, const char *argv[], t_master *m);
 void	error_check(char val, const char *msg);
 void	error_check_gl(GLenum error);
 size_t	allocate_graphic_side_objects(UINT *handles);
