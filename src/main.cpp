@@ -2,6 +2,7 @@
 #include "stb_image.h"
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
+#include <fcntl.h>
 
 static void	error_check_sdl(char val)
 {
@@ -58,9 +59,9 @@ GLfloat	square(GLfloat f)
 void	normalize(GLfloat *vec)
 {
 	GLfloat w = sqrt( vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] );
-    vec[0] /= w;
-    vec[1] /= w;
-    vec[2] /= w;
+vec[0] /= w;
+vec[1] /= w;
+vec[2] /= w;
 }
 
 void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
@@ -114,6 +115,35 @@ static void render_frame(UINT *handles, UINT texture, size_t len)
 	//loop_nb++;//TO_DELETE
 }
 
+unsigned char	*load_bmp(const char *file_path, int *width, int *height)
+{
+	unsigned char header[54];
+	size_t dataPos = 0;
+	size_t imageSize = 0;
+	unsigned char *data;
+	int	fd;
+
+	fd = open(file_path, O_RDONLY);
+	error_check(fd > 0, "Could not open the bmp file.");
+	error_check(read(fd, header, 54) == 54, "The file is not big enough to be formatted with bmp standards.");
+	error_check(header[0] == 'B' && header[1] == 'M', "BMP file should begin with BM");
+	dataPos = *(int*)&(header[0x0A]);
+	imageSize= *(int*)&(header[0x22]);
+	*width= *(int*)&(header[0x12]);
+	*height = *(int*)&(header[0x16]);
+	if (imageSize==0)
+		imageSize = (*width) * (*height) * 3;
+	if (dataPos==0)
+		dataPos=54;
+	printf("datapos = %lu.\n", dataPos);
+	lseek(fd, dataPos, SEEK_SET);
+	
+	data = (unsigned char*)malloc(imageSize);
+	error_check(read(fd, data, imageSize) == imageSize, "Could not read the size specified in the bmp file header.");
+	close(fd);
+	return (data);
+}
+
 /*
 **handles: 0-raw_vertices_data_handle, 1-vertex_shader_handle, 2-fragment
 **_shader_handle, 3-shader_program, 4-vertexArrayObject	5-EBO
@@ -148,17 +178,20 @@ void init_render(t_master *m)
 	// load image, create texture and generate mipmaps
 	int width, height, nrChannels;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char *data = stbi_load("cat.bmp", &width, &height, &nrChannels, 0);
+	unsigned char *data2 = stbi_load("cat.bmp", &width, &height, &nrChannels, 0);
+	printf("official width = %lu, height = %lu\n", width, height);
+	unsigned char *data = load_bmp("cat.bmp", &width, &height);
+	printf("home made width = %lu, height = %lu\n", width, height);
 	if (data)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 		puts("Failed to load texture");
-	stbi_image_free(data);
+	free(data);
 	glEnable(GL_DEPTH_TEST);
-	while (params[0])
+	while (params[0]) 
 	{
 		render_frame(handles, texture, len);
 		SDL_GL_SwapWindow(m->win);
