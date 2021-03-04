@@ -15,30 +15,31 @@ void	store_if_min_or_max(GLfloat *tab, GLfloat val)
 		tab[1] = val;
 }
 
-void	normalize_obj(t_parsing_storage *storage)
+void	normalize_obj(GLfloat *vertices, size_t vert_size)
 {
 	GLfloat			x[3];
 	GLfloat			y[3];
 	GLfloat			z[3];
-	unsigned int	i;
+	size_t			i;
 
-	check_vertices_number(storage);
-	assign_max_min_initial_values(x, storage->vert[0]);
-	assign_max_min_initial_values(y, storage->vert[1]);
-	assign_max_min_initial_values(z, storage->vert[2]);
+	if (vert_size < 3 || vert_size % 3 != 0)
+		return ;
+	assign_max_min_initial_values(x, vertices[0]);
+	assign_max_min_initial_values(y, vertices[1]);
+	assign_max_min_initial_values(z, vertices[2]);
 	i = 3;
-	while (i != storage->v_nb)
+	while (i != vert_size)
 	{
-		store_if_min_or_max(x, storage->vert[i]);
-		store_if_min_or_max(y, storage->vert[i + 1]);
-		store_if_min_or_max(z, storage->vert[i + 2]);
+		store_if_min_or_max(x, vertices[i]);
+		store_if_min_or_max(y, vertices[i + 1]);
+		store_if_min_or_max(z, vertices[i + 2]);
 		i += 3;
 	}
 	do_for_each(x, y, z, determine_tab_diff);
 	i = 0;
-	while (i != storage->v_nb)
+	while (i != vert_size)
 	{
-		affect_diffs(storage->vert + i, x[2], y[2], z[2]);
+		affect_diffs(vertices + i, x[2], y[2], z[2]);
 		i += 3;
 	}
 }

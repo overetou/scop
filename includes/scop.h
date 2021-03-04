@@ -75,7 +75,7 @@ GLfloat	*translation_mat4(GLfloat t_x, GLfloat t_y, GLfloat t_z);
 GLfloat	*perspective_mat4(GLfloat aspect_ratio,
 GLfloat vertical_field_of_view, GLfloat near_limit, GLfloat far_limit);
 void			load_obj(const char *path, t_parsing_storage *storage);
-void	normalize_obj(t_parsing_storage *storage);
+void	normalize_obj(GLfloat *vertices, size_t vert_size);
 void	check_vertices_number(t_parsing_storage *storage);
 void	assign_max_min_initial_values(GLfloat *tab, GLfloat val);
 void	determine_tab_diff(GLfloat *tab);

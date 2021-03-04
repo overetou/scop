@@ -145,6 +145,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		}
 		while (i != file_size && file_content[i++] != '\n');
 	}
+	normalize_obj(vertices, vert_size);
 	i = 0;
 	GLfloat	*final_vertices = NULL;
 	int index, vt_index;
