@@ -63,19 +63,33 @@ size_t *text_coord_nb)
 	*final_vert_size += 5;
 }
 
+void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n)
+{
+	size_t	i;
+
+	i = 0;
+	while(i != n)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+}
+
 void	handle_fourth_face(const char *file_content, size_t *i, GLfloat **final_vertices,
 const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
 size_t *text_coord_nb)
 {
 	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 10) * sizeof(GLfloat));
-	(*final_vertices)[*final_vert_size] = (*final_vertices)[(*final_vert_size) - 15];
-	(*final_vertices)[(*final_vert_size) + 1] = (*final_vertices)[(*final_vert_size) - 14];
-	(*final_vertices)[(*final_vert_size) + 2] = (*final_vertices)[(*final_vert_size) - 13];
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 15, 5);
+	//(*final_vertices)[*final_vert_size] = (*final_vertices)[(*final_vert_size) - 15];
+	//(*final_vertices)[(*final_vert_size) + 1] = (*final_vertices)[(*final_vert_size) - 14];
+	//(*final_vertices)[(*final_vert_size) + 2] = (*final_vertices)[(*final_vert_size) - 13];
 	//printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
 //(*final_vertices)[*final_vert_size], (*final_vertices)[(*final_vert_size) + 1], (*final_vertices)[(*final_vert_size) + 2]);
-	(*final_vertices)[(*final_vert_size) + 5] = (*final_vertices)[(*final_vert_size) - 5];
-	(*final_vertices)[(*final_vert_size) + 6] = (*final_vertices)[(*final_vert_size) - 4];
-	(*final_vertices)[(*final_vert_size) + 7] = (*final_vertices)[(*final_vert_size) - 3];
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 5, (*final_vertices) + (*final_vert_size) - 5, 5);
+	//(*final_vertices)[(*final_vert_size) + 5] = (*final_vertices)[(*final_vert_size) - 5];
+	//(*final_vertices)[(*final_vert_size) + 6] = (*final_vertices)[(*final_vert_size) - 4];
+	//(*final_vertices)[(*final_vert_size) + 7] = (*final_vertices)[(*final_vert_size) - 3];
 	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 10;
 	//puts("The next given vertex info will be the fourth point of the face.");
