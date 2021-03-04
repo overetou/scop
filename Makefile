@@ -8,28 +8,28 @@ INC_DIRS=includes
 LIB_DIRS=
 
 #Compilation related indications
-CC=g++
-CPPFLAGS=
+CC=clang
+CFLAGS=-Wall -Wextra -Werror
 LIBS=SDL2 GL GLEW m#m stands for mathlib
 
 #From there we use the info to compile everything.
-SRC_FILE_NAMES = cleaning.cpp main.cpp process_args.cpp gl_buffers.cpp loader.cpp bmp_loader.cpp matrix_basics.cpp matrix_gen.cpp matrix_mult.cpp vectors.cpp trio_simplification.cpp common.cpp
+SRC_FILE_NAMES = cleaning.c main.c process_args.c gl_buffers.c loader.c bmp_loader.c matrix_basics.c matrix_gen.c matrix_mult.c vectors.c trio_simplification.c common.c
 SOURCES=$(addprefix $(SRC_DIR)/, $(SRC_FILE_NAMES))
-OBJS:=$(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+OBJS:=$(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 INC_FLAGS=$(addprefix -I,$(INC_DIRS))
 LIBIDR_FLAGS=$(addprefix -L,$(LIB_DIRS))
-CPPFLAGS+=$(INC_FLAGS)
+CFLAGS+=$(INC_FLAGS)
 LIBS_FLAGS=$(addprefix -l,$(LIBS))
 VPATH=$(SRC_DIR)
 
 .phony: $(TARGET) clean re
 
 $(TARGET): $(OBJS) $(INC_DIRS)/scop.h
-	@$(CC) $(CPPFLAGS) $(OBJS) -o $(TARGET) $(LIBIDR_FLAGS) $(LIBS_FLAGS)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LIBIDR_FLAGS) $(LIBS_FLAGS)
 	@echo "Compilation succeeded."
 
-$(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp |$(OBJ_DIR)
-	@$(COMPILE.cpp) $(OUTPUT_OPTIONS) -o $@ $<
+$(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c |$(OBJ_DIR)
+	@$(COMPILE.c) $(OUTPUT_OPTIONS) -o $@ $<
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)

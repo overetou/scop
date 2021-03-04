@@ -84,5 +84,6 @@ GLfloat diff1, GLfloat diff2, GLfloat diff3);
 void	do_for_each(GLfloat *tab1, GLfloat *tab2,
 GLfloat *tab3, void (*func)(GLfloat *tab));
 unsigned char	*load_bmp_from_filename(const char *path);
-void	check_image_correct_read(int *n, unsigned char *image);
+GLfloat	degrees_to_radians(GLfloat degrees);
+
 #endif

@@ -1,7 +1,4 @@
 #include "scop.h"
-#include "stb_image.h"
-#include <iostream>
-#include <glm/gtx/string_cast.hpp>
 #include <fcntl.h>
 
 static void	error_check_sdl(char val)
@@ -104,7 +101,7 @@ static void render_frame(UINT *handles, UINT texture, size_t len)
 	//create transformations
 	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, vec);
 	home_view = translation_mat4(0, 0, -3);
-	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, glm::radians(45.0f), 0.1f, 100.0f);
+	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, degrees_to_radians(45), 0.1f, 100.0f);
 	// pass them to the shaders (3 different ways)
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
@@ -178,10 +175,7 @@ void init_render(t_master *m)
 	// load image, create texture and generate mipmaps
 	int width, height, nrChannels;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char *data2 = stbi_load("cat.bmp", &width, &height, &nrChannels, 0);
-	printf("official width = %lu, height = %lu\n", width, height);
 	unsigned char *data = load_bmp("cat.bmp", &width, &height);
-	printf("home made width = %lu, height = %lu\n", width, height);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
