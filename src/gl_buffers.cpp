@@ -52,6 +52,11 @@ size_t *text_coord_nb)
 			(*i)++;
 		(*i)++;
 	}
+	else
+	{
+		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
+		(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) + 1] + (*final_vertices)[(*final_vert_size) + 2];
+	}
 	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
