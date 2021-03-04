@@ -157,7 +157,7 @@ void init_render(t_master *m)
 	else
 		puts("Failed to load texture");
 	stbi_image_free(data);
-	glEnable(GL_DEPTH_TEST | GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	while (params[0])
 	{
 		render_frame(handles, texture, len);
