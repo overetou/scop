@@ -116,7 +116,7 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 {
 	unsigned char header[54];
 	size_t dataPos = 0;
-	size_t imageSize = 0;
+	ssize_t imageSize = 0;
 	unsigned char *data;
 	int	fd;
 
@@ -132,7 +132,6 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 		imageSize = (*width) * (*height) * 3;
 	if (dataPos==0)
 		dataPos=54;
-	printf("datapos = %lu.\n", dataPos);
 	lseek(fd, dataPos, SEEK_SET);
 	
 	data = (unsigned char*)malloc(imageSize);
@@ -157,34 +156,46 @@ void init_render(t_master *m)
 	params[0] = 1;
 	params[1] = 0;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+	gl_check_errors("glViewport");
 	glClearColor(0.3, 0.3, 0.3, 1);
+	gl_check_errors("glClearColor");
 	size_t len = allocate_graphic_side_objects(handles, m);
 	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
 	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
 	
 	unsigned int texture;
 	glGenTextures(1, &texture);
+	gl_check_errors("glGenTextures");
 	glActiveTexture(GL_TEXTURE0);
+	gl_check_errors("glActiveTexture");
 	glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+	gl_check_errors("glBindTextures");
 	// set the texture wrapping parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+	gl_check_errors("glTexParameteri 1");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	gl_check_errors("glTexParameteri 2");
 	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	gl_check_errors("glTexParameteri 3");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	gl_check_errors("glTexParameteri 4");
 	// load image, create texture and generate mipmaps
-	int width, height, nrChannels;
+	int width, height;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
 	unsigned char *data = load_bmp("cat.bmp", &width, &height);
 	if (data)
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+		gl_check_errors("glTexImage2D");
 		glGenerateMipmap(GL_TEXTURE_2D);
+		gl_check_errors("glGenerateMipmap");
 	}
 	else
 		puts("Failed to load texture");
 	free(data);
 	glEnable(GL_DEPTH_TEST);
+	gl_check_errors("glEnable GL_DEPTH_TEST");
 	while (params[0]) 
 	{
 		render_frame(handles, texture, len);

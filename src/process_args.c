@@ -29,7 +29,7 @@ static char	str_cmp_n(const char *s1, const char *s2, int len1, int len2)
 	return (1);
 }
 
-void		check_and_fill_args(const int argc, const char *argv[], t_master *m)
+void		check_and_fill_args(const char *argv[], t_master *m)
 {
 	size_t	len;
 
@@ -58,5 +58,5 @@ void		process_args(const int argc, const char *argv[], t_master *m)
 		exit(0);
 	}
 	error_check(argc == 3, USAGE);
-	check_and_fill_args(argc, argv, m);
+	check_and_fill_args(argv, m);
 }

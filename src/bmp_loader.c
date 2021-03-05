@@ -78,8 +78,7 @@ unsigned char	*load_bmp_from_filename(const char *path)
 {
 	unsigned char	header[54];
 	int				n[5];
-	unsigned char			*image;
-	GLuint			texture_name;
+	unsigned char	*image;
 
 	n[4] = open(path, O_RDONLY);
 	check_bmp_file(n[4], n, header);

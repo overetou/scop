@@ -25,14 +25,27 @@ const char *shader_source)
 	GL_COMPILE_STATUS);
 }
 
+void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n)
+{
+	size_t	i;
+
+	i = 0;
+	while(i != n)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+}
+
 void	parse_face_point(const char *file_content, size_t *i, GLfloat **final_vertices,
 const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
 size_t *text_coord_nb)
 {
 	int index;
 	int vt_index;
+	GLfloat shades[] = {0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.8, 0.8};
 
-	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 5) * sizeof(GLfloat));
+	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 8) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
 	//printf("v pos: %d read at index %lu.\n", index, *i);
 	(*final_vertices)[*final_vert_size] = vertices[(index - 1) * 3];
@@ -57,41 +70,23 @@ size_t *text_coord_nb)
 		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
 		(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) + 1] + (*final_vertices)[(*final_vert_size) + 2];
 	}
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 5, shades + (*i) % (3 * 3), 3);
 	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
-	*final_vert_size += 5;
-}
-
-void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	while(i != n)
-	{
-		dest[i] = src[i];
-		i++;
-	}
+	*final_vert_size += 8;
 }
 
 void	handle_fourth_face(const char *file_content, size_t *i, GLfloat **final_vertices,
 const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
 size_t *text_coord_nb)
 {
-	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 10) * sizeof(GLfloat));
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 15, 5);
-	//(*final_vertices)[*final_vert_size] = (*final_vertices)[(*final_vert_size) - 15];
-	//(*final_vertices)[(*final_vert_size) + 1] = (*final_vertices)[(*final_vert_size) - 14];
-	//(*final_vertices)[(*final_vert_size) + 2] = (*final_vertices)[(*final_vert_size) - 13];
+	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 16) * sizeof(GLfloat));
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 8);
 	//printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
-//(*final_vertices)[*final_vert_size], (*final_vertices)[(*final_vert_size) + 1], (*final_vertices)[(*final_vert_size) + 2]);
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 5, (*final_vertices) + (*final_vert_size) - 5, 5);
-	//(*final_vertices)[(*final_vert_size) + 5] = (*final_vertices)[(*final_vert_size) - 5];
-	//(*final_vertices)[(*final_vert_size) + 6] = (*final_vertices)[(*final_vert_size) - 4];
-	//(*final_vertices)[(*final_vert_size) + 7] = (*final_vertices)[(*final_vert_size) - 3];
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 8, (*final_vertices) + (*final_vert_size) - 8, 8);
 	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
-	*final_vert_size += 10;
+	*final_vert_size += 16;
 	//puts("The next given vertex info will be the fourth point of the face.");
 	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, text_coord_nb);
 }
@@ -110,12 +105,13 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	GLfloat *vertices = NULL;
 	size_t	text_coord_nb = 0;//Keeps count of the number of point that gave their texture coordinates.
 
+	puts("load_vertices start");
 	check_open(fd);
 	file_size = get_file_size(fd);
 	//printf("File size = %lu.\n", file_size);
 	file_content = (char*)malloc(file_size + 1);
 	file_content[file_size] = '\0';
-	if (read(fd, file_content, file_size) != file_size)
+	if (read(fd, file_content, file_size) != (ssize_t)file_size)
 	{
 		puts("Unable to read obj file correctly.");
 		exit(0);
@@ -148,7 +144,6 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	normalize_obj(vertices, vert_size);
 	i = 0;
 	GLfloat	*final_vertices = NULL;
-	int index, vt_index;
 	while (i + 1 < file_size)
 	{
 		if (file_content[i] == 'f' && file_content[i + 1] == ' ')
@@ -167,12 +162,12 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		while(i != file_size && file_content[i++] != '\n');
 	}
 	i = 0;
-	while(i != final_vert_size)
-	{
+	//while(i != final_vert_size)
+	//{
 		//printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
-		i += 5;
-	}
-	if (text_coord_nb == final_vert_size / 5)
+//		i += 8;
+//	}
+	if (text_coord_nb == final_vert_size / 8)
 		puts("texture coordinates seem to have been correctly given.");
 	else
 		puts("Texture coordinates absents or incomplete.");
@@ -198,29 +193,49 @@ size_t	allocate_graphic_side_objects(UINT *handles, t_master *m)
 	size_t	vertices_len;
 	GLfloat *home_vertices = load_vertices(m->obj_file_path, &vertices_len);
 	glGenVertexArrays(1, handles + 4);
+	gl_check_errors("glGenVertexArrays");
 	glGenBuffers(1, handles);
+	gl_check_errors("glGenBuffers");
 	//glGenBuffers(1, handles + 5);
 	glBindVertexArray(handles[4]);
+	gl_check_errors("glBindVertexArray");
 	glBindBuffer(GL_ARRAY_BUFFER, *handles);
+	gl_check_errors("glBindBuffer");
 	glBufferData(GL_ARRAY_BUFFER, vertices_len * sizeof(GLfloat), home_vertices, GL_STATIC_DRAW);
+	gl_check_errors("glBufferData");
 	free(home_vertices);
 	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handles[5]);
     //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	compile_shader(GL_VERTEX_SHADER, handles + 1, VERTEX_SHADER_SOURCE);
 	compile_shader(GL_FRAGMENT_SHADER, handles + 2, FRAGMENT_SHADER_SOURCE);
 	handles[3] = glCreateProgram();
+	gl_check_errors("glCreateProgram");
 	glAttachShader(handles[3], handles[1]);
+	gl_check_errors("glAttachShader 1");
 	glAttachShader(handles[3], handles[2]);
+	gl_check_errors("glAttachShader 2");
 	glLinkProgram(handles[3]);
+	gl_check_errors("glLinkProgram");
 	check_compilation_step_success(handles[3], glGetProgramiv, GL_LINK_STATUS);
 	glDeleteShader(handles[1]);
+	gl_check_errors("glDeleteShader");
 	glDeleteShader(handles[2]);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	gl_check_errors("glDeleteShader");
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	gl_check_errors("glVertexAttribPointer");
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	gl_check_errors("glEnableVertexAttribArray");
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	gl_check_errors("glVertexAttribPointer");
 	glEnableVertexAttribArray(1);
+	gl_check_errors("glEnableVertexAttribArray");
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+	gl_check_errors("glVertexAttribPointer");
+	glEnableVertexAttribArray(2);
+	gl_check_errors("glEnableVertexAttribArray");
 	glUseProgram(handles[3]);
-	return (vertices_len / 5);
+	gl_check_errors("glUseProgram");
+	return (vertices_len / 8);
 }
 
 void	desallocate_graphic_side_objects(UINT *handles)

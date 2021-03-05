@@ -43,3 +43,15 @@ void	normalize_obj(GLfloat *vertices, size_t vert_size)
 		i += 3;
 	}
 }
+
+void	gl_check_errors(const char *msg)
+{
+	GLenum	code;
+
+	code = glGetError();
+	if (code != GL_NO_ERROR)
+	{
+		printf("Error code: %x at step: %s.\n", code, msg);
+		exit(0);
+	}
+}
