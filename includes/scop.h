@@ -15,28 +15,33 @@
 #define VERTEX_SHADER_SOURCE "#version 440 core\n"\
 "layout (location = 0) in vec3 aPos;\n"\
 "layout (location = 1) in vec2 aTexCoord;\n"\
+"layout (location = 2) in vec3 colors;\n"\
 "uniform mat4 model;\n"\
 "uniform mat4 view;\n"\
 "uniform mat4 projection;\n"\
 "out vec2 TexCoord;\n"\
+"out vec3 frag_colors;\n"\
 "void main()\n"\
 "{\n"\
 "	gl_Position = projection * view * model * vec4(aPos, 1.0);\n"\
 "	TexCoord = aTexCoord;\n"\
+"	frag_colors = colors;\n"\
 "}\n"
 
 #define FRAGMENT_SHADER_SOURCE "#version 440 core\n"\
 "in vec2 TexCoord;\n"\
+"in vec3 frag_colors;\n"\
 "out vec4 FragColor;\n"\
 "uniform sampler2D ourTexture;\n"\
 "void main()\n"\
 "{\n"\
-"    FragColor = texture(ourTexture, TexCoord);\n"\
+"    FragColor = vec4(frag_colors, 1);\n"\
 "}\n"
 #define USAGE "Wrong number of arguments.\nUsage:\t./scop"\
 " <file>.obj <file>.bmp\n\tOr\n\t./scop [specs /"\
 " vertex_shader_source / fragment_shader_source]"
-//"uniform vec4 fixedColor;"
+
+/* "    FragColor = texture(ourTexture, TexCoord);\n"\ */
 
 typedef struct	s_master
 {

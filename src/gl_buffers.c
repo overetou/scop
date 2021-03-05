@@ -70,7 +70,7 @@ size_t *text_coord_nb)
 		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
 		(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) + 1] + (*final_vertices)[(*final_vert_size) + 2];
 	}
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 5, shades + (*i) % (3 * 3), 3);
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 5, shades + (index % 3) * 3, 3);
 	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
