@@ -31,12 +31,15 @@
 #define FRAGMENT_SHADER_SOURCE "#version 440 core\n"\
 "in vec2 TexCoord;\n"\
 "in vec3 frag_colors;\n"\
-"out vec4 FragColor;\n"\
+"out vec4 final_color;\n"\
 "uniform sampler2D ourTexture;\n"\
+"uniform float transition_degree;\n"\
 "void main()\n"\
 "{\n"\
-"    FragColor = vec4(frag_colors, 1);\n"\
+"    final_color = vec4(texture(ourTexture, TexCoord).rgb * transition_degree +"\
+"    frag_colors * (1 - transition_degree), 1);\n"\
 "}\n"
+
 #define USAGE "Wrong number of arguments.\nUsage:\t./scop"\
 " <file>.obj <file>.bmp\n\tOr\n\t./scop [specs /"\
 " vertex_shader_source / fragment_shader_source]"
@@ -48,6 +51,9 @@ typedef struct	s_master
 	SDL_Window	*win;
 	const char	*obj_file_path;
 	const char	*text_file_path;
+	GLuint		transition_time_marker;
+	GLfloat		transition_state;
+	char		direction;
 }				t_master;
 
 typedef struct	s_parsing_storage

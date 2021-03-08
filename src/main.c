@@ -1,6 +1,22 @@
 #include "scop.h"
 #include <fcntl.h>
 
+void	handle_smooth_transition(t_master *render_data, GLuint time)
+{
+	if (render_data->transition_time_marker + 5000 > time)
+	{
+		render_data->transition_state = 1.0f /
+		(5000.0f / (float)(time - render_data->transition_time_marker));
+		if (render_data->direction == 0)
+			render_data->transition_state = 1 - render_data->transition_state;
+	}
+	else
+	{
+		render_data->transition_state = (float)(render_data->direction);
+		render_data->transition_time_marker = 0;
+	}
+}
+
 static void	error_check_sdl(char val)
 {
 	if (val)
@@ -17,7 +33,7 @@ void		error_check(char val, const char *msg)
 	exit(0);
 }
 
-void handle_events(char *params)
+void handle_events(char *params, t_master *m)
 {
 	SDL_Event e;
 
@@ -42,6 +58,14 @@ void handle_events(char *params)
 				else
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 				params[1] = !(params[1]);
+			}
+			else if (e.key.keysym.sym == SDLK_t && m->transition_time_marker == 0)
+			{
+				if (m->direction)
+					m->direction = 0;
+				else
+					m->direction = 1;
+				m->transition_time_marker = SDL_GetTicks();
 			}
 			break;
 		}
@@ -87,7 +111,7 @@ void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 	mat4[15] = 1;
 }
 
-static void render_frame(UINT *handles, UINT texture, size_t len)
+static void render_frame(UINT *handles, UINT texture, size_t len, GLfloat transition_degree)
 {
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
@@ -95,6 +119,7 @@ static void render_frame(UINT *handles, UINT texture, size_t len)
 	GLfloat	home_model[16];
 	GLfloat *home_view;
 	GLfloat *home_proj;
+	GLuint	transition_handle;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -106,6 +131,8 @@ static void render_frame(UINT *handles, UINT texture, size_t len)
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, home_proj);
+	transition_handle = glGetUniformLocation(handles[3], "transition_degree");
+	glUniform1f(transition_handle, transition_degree);
 	glDrawArrays(GL_TRIANGLES, 0, len);
 	free(home_view);
 	free(home_proj);
@@ -149,6 +176,9 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 */
 void init_render(t_master *m)
 {
+	m->transition_time_marker = 0;
+	m->transition_state = 0;
+	m->direction = 0;
 	UINT handles[6];
 	char params[2];
 	//int uniform_location;
@@ -184,23 +214,20 @@ void init_render(t_master *m)
 	int width, height;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
 	unsigned char *data = load_bmp("cat.bmp", &width, &height);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
-		gl_check_errors("glTexImage2D");
-		glGenerateMipmap(GL_TEXTURE_2D);
-		gl_check_errors("glGenerateMipmap");
-	}
-	else
-		puts("Failed to load texture");
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+	gl_check_errors("glTexImage2D");
+	glGenerateMipmap(GL_TEXTURE_2D);
+	gl_check_errors("glGenerateMipmap");
 	free(data);
 	glEnable(GL_DEPTH_TEST);
 	gl_check_errors("glEnable GL_DEPTH_TEST");
 	while (params[0]) 
 	{
-		render_frame(handles, texture, len);
+		if (m->transition_time_marker)
+			handle_smooth_transition(m, SDL_GetTicks());
+		render_frame(handles, texture, len, m->transition_state);
 		SDL_GL_SwapWindow(m->win);
-		handle_events(params);
+		handle_events(params, m);
 	}
 	desallocate_graphic_side_objects(handles);
 }
