@@ -57,9 +57,3 @@ void	multiply_mat4(GLfloat *mat1, GLfloat *mat2, GLfloat *result)
 		cur_row++;
 	}
 }
-
-void	check_bmp_file(int fd, int *n, unsigned char *header)
-{
-	check_open(fd);
-	check_file_format(n, header);
-}

@@ -105,7 +105,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	GLfloat	*vertices = NULL;
 	size_t	text_coord_nb = 0;//Keeps count of the number of point that gave their texture coordinates.
 
-	check_open(fd);
+	error_check(fd > 0, "Could not read obj file.");
 	file_size = get_file_size(fd);
 	//printf("File size = %lu.\n", file_size);
 	file_content = (char*)malloc(file_size + 1);
