@@ -67,6 +67,14 @@ void handle_events(char *params, t_master *m)
 					m->direction = 1;
 				m->transition_time_marker = SDL_GetTicks();
 			}
+			else if (e.key.keysym.sym == SDLK_c)
+				fill_vec3(m->rotation_axis, 0.0, 1.0, 0.0);
+			else if (e.key.keysym.sym == SDLK_p)
+				fill_vec3(m->rotation_axis, 0.0, 0.0, 1.0);
+			else if (e.key.keysym.sym == SDLK_f)
+				fill_vec3(m->rotation_axis, 1.0, 0.0, 0.0);
+			else if (e.key.keysym.sym == SDLK_m)
+				fill_vec3(m->rotation_axis, 0.1, 1.0, 1.0);
 			break;
 		}
 	}
