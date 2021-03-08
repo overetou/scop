@@ -111,11 +111,10 @@ void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 	mat4[15] = 1;
 }
 
-static void render_frame(UINT *handles, UINT texture, size_t len, GLfloat transition_degree)
+static void render_frame(UINT *handles, UINT texture, size_t len, t_master *m)
 {
 	const unsigned int SCR_WIDTH = 800;
 	const unsigned int SCR_HEIGHT = 600;
-	GLfloat	vec[] = {1.0f, 0.5f, 0.3f};
 	GLfloat	home_model[16];
 	GLfloat *home_view;
 	GLfloat *home_proj;
@@ -124,7 +123,7 @@ static void render_frame(UINT *handles, UINT texture, size_t len, GLfloat transi
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//create transformations
-	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, vec);
+	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, m->rotation_axis);
 	home_view = translation_mat4(0, 0, -3);
 	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, degrees_to_radians(45), 0.1f, 100.0f);
 	// pass them to the shaders (3 different ways)
@@ -132,7 +131,7 @@ static void render_frame(UINT *handles, UINT texture, size_t len, GLfloat transi
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, home_proj);
 	transition_handle = glGetUniformLocation(handles[3], "transition_degree");
-	glUniform1f(transition_handle, transition_degree);
+	glUniform1f(transition_handle, m->transition_state);
 	glDrawArrays(GL_TRIANGLES, 0, len);
 	free(home_view);
 	free(home_proj);
@@ -185,6 +184,7 @@ void init_render(t_master *m)
 
 	params[0] = 1;
 	params[1] = 0;
+	fill_vec3(m->rotation_axis, 0.0, 1.0, 0.0);
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	gl_check_errors("glViewport");
 	glClearColor(0.3, 0.3, 0.3, 1);
@@ -225,7 +225,7 @@ void init_render(t_master *m)
 	{
 		if (m->transition_time_marker)
 			handle_smooth_transition(m, SDL_GetTicks());
-		render_frame(handles, texture, len, m->transition_state);
+		render_frame(handles, texture, len, m);
 		SDL_GL_SwapWindow(m->win);
 		handle_events(params, m);
 	}

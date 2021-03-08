@@ -54,6 +54,7 @@ typedef struct	s_master
 	GLuint		transition_time_marker;
 	GLfloat		transition_state;
 	char		direction;
+	GLfloat		rotation_axis[3];
 }				t_master;
 
 typedef struct	s_parsing_storage
