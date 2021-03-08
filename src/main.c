@@ -54,9 +54,15 @@ void handle_events(char *params, t_master *m)
 			else if (e.key.keysym.sym == SDLK_w)
 			{
 				if (params[1])
+				{
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					gl_check_errors("glPolygonMode");
+				}
 				else
+				{
 					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+					gl_check_errors("glPolygonMode 2");
+				}
 				params[1] = !(params[1]);
 			}
 			else if (e.key.keysym.sym == SDLK_t && m->transition_time_marker == 0)
@@ -159,18 +165,26 @@ static void render_frame(UINT *handles, UINT texture, size_t len, t_master *m)
 	GLuint	transition_handle;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	gl_check_errors("glClear");
 	glBindTexture(GL_TEXTURE_2D, texture);
+	gl_check_errors("glBindTexture");
 	//create transformations
 	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, m->rotation_axis);
 	home_view = translation_mat4(m->relative_coordinates[0], m->relative_coordinates[1], m->relative_coordinates[2]);
 	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, degrees_to_radians(45), 0.1f, 100.0f);
 	// pass them to the shaders (3 different ways)
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
+	gl_check_errors("glUniformMatrix4fv 1");
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
+	gl_check_errors("glUniformMatrix4fv 2");
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, home_proj);
+	gl_check_errors("glUniformMatrix4fv 3");
 	transition_handle = glGetUniformLocation(handles[3], "transition_degree");
+	gl_check_errors("glGetUniformLocation");
 	glUniform1f(transition_handle, m->transition_state);
+	gl_check_errors("glUniform1f");
 	glDrawArrays(GL_TRIANGLES, 0, len);
+	gl_check_errors("glDrawArrays");
 	free(home_view);
 	free(home_proj);
 	//loop_nb++;//TO_DELETE
@@ -231,8 +245,6 @@ void init_render(t_master *m)
 	glClearColor(0.3, 0.3, 0.3, 1);
 	gl_check_errors("glClearColor");
 	size_t len = allocate_graphic_side_objects(handles, m);
-	/* uniform_location = glGetUniformLocation(handles[3], "fixedColor");
-	glUniform4f(uniform_location, 0.7, 0, 0, 1); */
 	
 	unsigned int texture;
 	glGenTextures(1, &texture);

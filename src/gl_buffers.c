@@ -240,7 +240,9 @@ size_t	allocate_graphic_side_objects(UINT *handles, t_master *m)
 void	desallocate_graphic_side_objects(UINT *handles)
 {
 	glDeleteVertexArrays(1, handles + 4);
+	gl_check_errors("glDeleteVertexArrays");
 	glDeleteBuffers(1, handles);
-	//glDeleteBuffers(1, handles + 5);
+	gl_check_errors("glDeleteBuffers");
 	glDeleteProgram(handles[3]);
+	gl_check_errors("glDeleteProgram");
 }
