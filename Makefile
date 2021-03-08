@@ -28,7 +28,7 @@ $(TARGET): $(OBJS) $(INC_DIRS)/scop.h
 	@$(CC) $(CFLAGS) $(OBJS) -o $(TARGET) $(LIBIDR_FLAGS) $(LIBS_FLAGS)
 	@echo "Compilation succeeded."
 
-$(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c |$(OBJ_DIR)
+$(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c $(INC_DIRS)/scop.h |$(OBJ_DIR)
 	@$(COMPILE.c) $(OUTPUT_OPTIONS) -o $@ $<
 
 $(OBJ_DIR):
