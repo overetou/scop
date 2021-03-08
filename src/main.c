@@ -75,6 +75,36 @@ void handle_events(char *params, t_master *m)
 				fill_vec3(m->rotation_axis, 1.0, 0.0, 0.0);
 			else if (e.key.keysym.sym == SDLK_m)
 				fill_vec3(m->rotation_axis, 0.1, 1.0, 1.0);
+			else if (e.key.keysym.sym == SDLK_LEFT)
+			{
+				if (m->relative_coordinates[0] > -2)
+					m->relative_coordinates[0] -= 0.1;
+			}
+			else if (e.key.keysym.sym == SDLK_RIGHT)
+			{
+				if (m->relative_coordinates[0] < 2)
+					m->relative_coordinates[0] += 0.1;
+			}
+			else if (e.key.keysym.sym == SDLK_DOWN)
+			{
+				if (m->relative_coordinates[1] > -2)
+					m->relative_coordinates[1] -= 0.1;
+			}
+			else if (e.key.keysym.sym == SDLK_UP)
+			{
+				if (m->relative_coordinates[1] < 2)
+					m->relative_coordinates[1] += 0.1;
+			}
+			else if (e.key.keysym.sym == SDLK_MINUS)
+			{
+				if (m->relative_coordinates[2] > -7)
+					m->relative_coordinates[2] -= 0.5;
+			}
+			else if (e.key.keysym.sym == SDLK_z)
+			{
+				if (m->relative_coordinates[2] < -2)
+					m->relative_coordinates[2] += 0.5;
+			}
 			break;
 		}
 	}
@@ -132,7 +162,7 @@ static void render_frame(UINT *handles, UINT texture, size_t len, t_master *m)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	//create transformations
 	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, m->rotation_axis);
-	home_view = translation_mat4(0, 0, -3);
+	home_view = translation_mat4(m->relative_coordinates[0], m->relative_coordinates[1], m->relative_coordinates[2]);
 	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, degrees_to_radians(45), 0.1f, 100.0f);
 	// pass them to the shaders (3 different ways)
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
@@ -193,6 +223,9 @@ void init_render(t_master *m)
 	params[0] = 1;
 	params[1] = 0;
 	fill_vec3(m->rotation_axis, 0.0, 1.0, 0.0);
+	m->relative_coordinates[0] = 0;
+	m->relative_coordinates[1] = 0;
+	m->relative_coordinates[2] = -3;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	gl_check_errors("glViewport");
 	glClearColor(0.3, 0.3, 0.3, 1);

@@ -99,10 +99,10 @@ char	is_digit(const char c)
 GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 {
 	size_t	file_size, vert_size = 0, final_vert_size = 0;
-	int fd = open(file_name, O_RDONLY);
+	int		fd = open(file_name, O_RDONLY);
 	size_t	i = 0;
 	char	*file_content;
-	GLfloat *vertices = NULL;
+	GLfloat	*vertices = NULL;
 	size_t	text_coord_nb = 0;//Keeps count of the number of point that gave their texture coordinates.
 
 	check_open(fd);
