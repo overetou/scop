@@ -37,18 +37,16 @@ void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n)
 	}
 }
 
-GLfloat	shaker = 0.25;
-
-void	change_shaker()
+void	change_shaker(GLfloat *shaker)
 {
-	if (shaker < 0.55)
-		shaker += 0.02;
+	if (*shaker < 0.55)
+		*shaker += 0.02;
 	else
-		shaker = 0.25;
+		*shaker = 0.25;
 }
 
 void	parse_face_point(const char *file_content, size_t *i, GLfloat **final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size)
+const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size, GLfloat *shaker)
 {
 	int index;
 	int vt_index;
@@ -77,8 +75,8 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
 		(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) + 1] + (*final_vertices)[(*final_vert_size) + 2];
 	}
-	fill_vec3((*final_vertices) + (*final_vert_size) + 5, shaker, shaker, shaker);
-	change_shaker();
+	fill_vec3((*final_vertices) + (*final_vert_size) + 5, *shaker, *shaker, *shaker);
+	change_shaker(shaker);
 	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
@@ -86,20 +84,20 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 }
 
 void	handle_fourth_face(const char *file_content, size_t *i, GLfloat **final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size)
+const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size, GLfloat *shaker)
 {
 	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 16) * sizeof(GLfloat));
 	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 5);
-	fill_vec3((*final_vertices) + (*final_vert_size) + 5, shaker, shaker, shaker);
-	change_shaker();
+	fill_vec3((*final_vertices) + (*final_vert_size) + 5, *shaker, *shaker, *shaker);
+	change_shaker(shaker);
 	//printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
 	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 8, (*final_vertices) + (*final_vert_size) - 8, 8);
-	fill_vec3((*final_vertices) + (*final_vert_size) + 13, shaker, shaker, shaker);
-	change_shaker();
+	fill_vec3((*final_vertices) + (*final_vert_size) + 13, *shaker, *shaker, *shaker);
+	change_shaker(shaker);
 	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 16;
 	//puts("The next given vertex info will be the fourth point of the face.");
-	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size);
+	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, shaker);
 }
 
 char	is_digit(const char c)
@@ -114,6 +112,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	size_t	i = 0;
 	char	*file_content;
 	GLfloat	*vertices = NULL;
+	GLfloat	shaker = 0.25;
 
 	error_check(fd > 0, "Could not read obj file.");
 	file_size = get_file_size(fd);
@@ -159,14 +158,14 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		{
 			i += 2;
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size);
+			&final_vert_size, &shaker);
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size);
+			&final_vert_size, &shaker);
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size);
+			&final_vert_size, &shaker);
 			if (i < file_size && is_digit(file_content[i]))
 				handle_fourth_face(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size);
+			&final_vert_size, &shaker);
 		}
 		while(i != file_size && file_content[i++] != '\n');
 	}
