@@ -19,15 +19,6 @@ void	fill_vec3(GLfloat *vec, GLfloat val1, GLfloat val2, GLfloat val3)
 	vec[2] = val3;
 }
 
-GLfloat	*create_vec3(GLfloat val1, GLfloat val2, GLfloat val3)
-{
-	GLfloat	*result;
-
-	result = (GLfloat*)secure_malloc(3 * sizeof(GLfloat));
-	fill_vec3(result, val1, val2, val3);
-	return (result);
-}
-
 GLfloat	dot_product(GLfloat *vec3_1, GLfloat *vec3_2)
 {
 	GLfloat	result;

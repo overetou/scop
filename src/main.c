@@ -124,9 +124,9 @@ GLfloat	square(GLfloat f)
 void	normalize(GLfloat *vec)
 {
 	GLfloat w = sqrt( vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2] );
-vec[0] /= w;
-vec[1] /= w;
-vec[2] /= w;
+	vec[0] /= w;
+	vec[1] /= w;
+	vec[2] /= w;
 }
 
 void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
