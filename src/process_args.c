@@ -38,6 +38,10 @@ void		check_and_fill_args(const char *argv[], t_master *m)
 	argv[1][len - 2] == 'b' && argv[1][len - 3] == 'o' &&
 	argv[1][len - 4] == '.', "Expected a file with the extension '.obj' as first argument.");
 	m->obj_file_path = argv[1];
+	len = str_len(argv[2]);
+	error_check(argv[2][len - 1] == 'p' && argv[2][len - 2] == 'm' && argv[2][len - 3] == 'b' &&
+	argv[2][len - 4] == '.', "Expected a file with the extension '.bmp' as second argument.");
+	m->text_file_path = argv[2];
 }
 
 void		process_args(const int argc, const char *argv[], t_master *m)

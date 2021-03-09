@@ -266,7 +266,7 @@ void init_render(t_master *m)
 	// load image, create texture and generate mipmaps
 	int width, height;
 	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-	unsigned char *data = load_bmp("cat.bmp", &width, &height);
+	unsigned char *data = load_bmp(m->text_file_path, &width, &height);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 	gl_check_errors("glTexImage2D");
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -310,5 +310,5 @@ int			main(int argc, char const *argv[])
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(m.win);
 	SDL_Quit();
-	return 0;
+	return (0);
 }

@@ -48,8 +48,7 @@ void	change_shaker()
 }
 
 void	parse_face_point(const char *file_content, size_t *i, GLfloat **final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
-size_t *text_coord_nb)
+const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size)
 {
 	int index;
 	int vt_index;
@@ -69,7 +68,6 @@ size_t *text_coord_nb)
 		//printf("vt pos: %d.\n", vt_index);
 		(*final_vertices)[(*final_vert_size) + 3] = vts[(vt_index - 1) * 2];
 		(*final_vertices)[(*final_vert_size) + 4] = vts[(vt_index - 1) * 2 + 1];
-		(*text_coord_nb)++;
 		while(*i != file_size && file_content[*i] != ' ' && file_content[*i] != '\n')
 			(*i)++;
 		(*i)++;
@@ -88,8 +86,7 @@ size_t *text_coord_nb)
 }
 
 void	handle_fourth_face(const char *file_content, size_t *i, GLfloat **final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
-size_t *text_coord_nb)
+const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size)
 {
 	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 16) * sizeof(GLfloat));
 	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 5);
@@ -102,7 +99,7 @@ size_t *text_coord_nb)
 	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 16;
 	//puts("The next given vertex info will be the fourth point of the face.");
-	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, text_coord_nb);
+	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size);
 }
 
 char	is_digit(const char c)
@@ -117,7 +114,6 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	size_t	i = 0;
 	char	*file_content;
 	GLfloat	*vertices = NULL;
-	size_t	text_coord_nb = 0;//Keeps count of the number of point that gave their texture coordinates.
 
 	error_check(fd > 0, "Could not read obj file.");
 	file_size = get_file_size(fd);
@@ -163,14 +159,14 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		{
 			i += 2;
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &text_coord_nb);
+			&final_vert_size);
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &text_coord_nb);
+			&final_vert_size);
 			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &text_coord_nb);
+			&final_vert_size);
 			if (i < file_size && is_digit(file_content[i]))
 				handle_fourth_face(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &text_coord_nb);
+			&final_vert_size);
 		}
 		while(i != file_size && file_content[i++] != '\n');
 	}
@@ -180,10 +176,6 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		//printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
 //		i += 8;
 //	}
-	if (text_coord_nb == final_vert_size / 8)
-		puts("texture coordinates seem to have been correctly given.");
-	else
-		puts("Texture coordinates absents or incomplete.");
 	*vertices_len = final_vert_size;
 	free(file_content);
 	if (vertices)
