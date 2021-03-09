@@ -37,13 +37,22 @@ void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n)
 	}
 }
 
+GLfloat	shaker = 0.25;
+
+void	change_shaker()
+{
+	if (shaker < 0.55)
+		shaker += 0.02;
+	else
+		shaker = 0.25;
+}
+
 void	parse_face_point(const char *file_content, size_t *i, GLfloat **final_vertices,
 const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size,
 size_t *text_coord_nb)
 {
 	int index;
 	int vt_index;
-	GLfloat shades[] = {0.3, 0.3, 0.3, 0.45, 0.45, 0.45, 0.6, 0.6, 0.6};
 
 	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 8) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
@@ -70,7 +79,8 @@ size_t *text_coord_nb)
 		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
 		(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) + 1] + (*final_vertices)[(*final_vert_size) + 2];
 	}
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 5, shades + (index % 3) * 3, 3);
+	fill_vec3((*final_vertices) + (*final_vert_size) + 5, shaker, shaker, shaker);
+	change_shaker();
 	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
@@ -82,9 +92,13 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 size_t *text_coord_nb)
 {
 	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 16) * sizeof(GLfloat));
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 8);
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 5);
+	fill_vec3((*final_vertices) + (*final_vert_size) + 5, shaker, shaker, shaker);
+	change_shaker();
 	//printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
 	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 8, (*final_vertices) + (*final_vert_size) - 8, 8);
+	fill_vec3((*final_vertices) + (*final_vert_size) + 13, shaker, shaker, shaker);
+	change_shaker();
 	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 16;
 	//puts("The next given vertex info will be the fourth point of the face.");
