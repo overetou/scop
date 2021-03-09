@@ -30,7 +30,7 @@
 
 #define FRAGMENT_SHADER_SOURCE "#version 440 core\n"\
 "in vec2 TexCoord;\n"\
-"in vec3 frag_colors;\n"\
+"in flat vec3 frag_colors;\n"\
 "out vec4 final_color;\n"\
 "uniform sampler2D ourTexture;\n"\
 "uniform float transition_degree;\n"\

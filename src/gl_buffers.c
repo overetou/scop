@@ -43,7 +43,7 @@ size_t *text_coord_nb)
 {
 	int index;
 	int vt_index;
-	GLfloat shades[] = {0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.8, 0.8, 0.8};
+	GLfloat shades[] = {0.3, 0.3, 0.3, 0.45, 0.45, 0.45, 0.6, 0.6, 0.6};
 
 	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 8) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");

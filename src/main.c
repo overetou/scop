@@ -242,7 +242,7 @@ void init_render(t_master *m)
 	m->relative_coordinates[2] = -3;
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	gl_check_errors("glViewport");
-	glClearColor(0.3, 0.3, 0.3, 1);
+	glClearColor(0.3, 0.3, 0.4, 1);
 	gl_check_errors("glClearColor");
 	size_t len = allocate_graphic_side_objects(handles, m);
 	
