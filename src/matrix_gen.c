@@ -16,7 +16,7 @@ GLfloat	*identity_mat4(void)
 {
 	GLfloat	*result;
 
-	result = (GLfloat*)malloc(16 * sizeof(GLfloat));
+	result = (GLfloat*)secure_malloc(16 * sizeof(GLfloat));
 	fill_vec3(result, 1, 0, 0);
 	result[3] = 0;
 	fill_vec3(result + 4, 0, 1, 0);

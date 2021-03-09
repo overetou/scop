@@ -13,3 +13,14 @@ void	*secure_realloc(void *to_realloc, size_t new_size)
 	puts("A realloc failed.");
 	exit(0);
 }
+
+void	*secure_malloc(const size_t len)
+{
+	void *res;
+
+	res = malloc(len);
+	if (res)
+		return (res);
+	puts("A malloc failed.");
+	exit(0);
+}

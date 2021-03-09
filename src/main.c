@@ -212,7 +212,7 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 		dataPos=54;
 	lseek(fd, dataPos, SEEK_SET);
 	
-	data = (unsigned char*)malloc(imageSize);
+	data = (unsigned char*)secure_malloc(imageSize);
 	error_check(read(fd, data, imageSize) == imageSize, "Could not read the size specified in the bmp file header.");
 	close(fd);
 	return (data);

@@ -68,13 +68,10 @@ typedef struct	s_parsing_storage
 
 void			process_args(const int argc, const char *argv[], t_master *m);
 void			error_check(char val, const char *msg);
-void			error_check_gl(GLenum error);
 size_t			allocate_graphic_side_objects(UINT *handles, t_master *m);
 void			desallocate_graphic_side_objects(UINT *handles);
 GLfloat			*identity_mat4(void);
 unsigned int	get_file_size(int fd);
-void			try_line_parsing(const char *header, const char *content,
-unsigned int *pos, t_parsing_storage *storage);
 GLfloat			vector_length(GLfloat *vec3);
 void			cross_product(GLfloat *vec3_1, GLfloat *vec3_2, GLfloat *result);
 void			fill_vec3(GLfloat *vec, GLfloat val1, GLfloat val2, GLfloat val3);
@@ -94,8 +91,8 @@ void			affect_diffs(GLfloat *vertices_sub_tab,
 GLfloat			diff1, GLfloat diff2, GLfloat diff3);
 void			do_for_each(GLfloat *tab1, GLfloat *tab2,
 GLfloat *tab3, void (*func)(GLfloat *tab));
-unsigned char	*load_bmp_from_filename(const char *path);
 GLfloat			degrees_to_radians(GLfloat degrees);
 void			gl_check_errors(const char *msg);
+void			*secure_malloc(const size_t len);
 
 #endif

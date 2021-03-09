@@ -117,7 +117,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	error_check(fd > 0, "Could not read obj file.");
 	file_size = get_file_size(fd);
 	//printf("File size = %lu.\n", file_size);
-	file_content = (char*)malloc(file_size + 1);
+	file_content = (char*)secure_malloc(file_size + 1);
 	file_content[file_size] = '\0';
 	if (read(fd, file_content, file_size) != (ssize_t)file_size)
 	{

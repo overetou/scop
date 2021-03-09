@@ -23,7 +23,7 @@ GLfloat	*create_vec3(GLfloat val1, GLfloat val2, GLfloat val3)
 {
 	GLfloat	*result;
 
-	result = (GLfloat*)malloc(3 * sizeof(GLfloat));
+	result = (GLfloat*)secure_malloc(3 * sizeof(GLfloat));
 	fill_vec3(result, val1, val2, val3);
 	return (result);
 }

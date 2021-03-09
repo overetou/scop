@@ -37,7 +37,7 @@ GLfloat	*look_at_mat4(GLfloat *cam_pos, GLfloat *focus_pos, GLfloat *up_pos)
 	GLfloat	temp[3];
 	GLfloat	*result;
 
-	result = (GLfloat*)malloc(16 * sizeof(GLfloat));
+	result = (GLfloat*)secure_malloc(16 * sizeof(GLfloat));
 	vector_substraction(focus_pos, cam_pos, temp);
 	normalize_vec3(temp, z_axis);
 	normalize_vec3(up_pos, y_axis);
@@ -63,7 +63,7 @@ GLfloat vertical_field_of_view, GLfloat near_limit, GLfloat far_limit)
 	GLfloat	*result;
 	GLfloat	tan_half_angle;
 
-	result = (GLfloat*)malloc(16 * sizeof(GLfloat));
+	result = (GLfloat*)secure_malloc(16 * sizeof(GLfloat));
 	tan_half_angle = tan(vertical_field_of_view / 2);
 	fill_vec3(result, 1 / (aspect_ratio * tan_half_angle), 0, 0);
 	result[3] = 0;
