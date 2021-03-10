@@ -60,10 +60,9 @@ typedef struct	s_master
 
 typedef struct	s_parsing_storage
 {
-	GLfloat		*vert;
-	GLuint		v_nb;
-	GLuint		*v_ind;
-	GLuint		v_ind_size;
+	size_t	file_size;
+	size_t	vert_size;
+	size_t	final_vert_size;
 }				t_parsing_storage;
 
 void			process_args(const int argc, const char *argv[], t_master *m);
@@ -82,9 +81,7 @@ void			normalize_vec3(GLfloat *source, GLfloat *result);
 GLfloat			*translation_mat4(GLfloat t_x, GLfloat t_y, GLfloat t_z);
 GLfloat			*perspective_mat4(GLfloat aspect_ratio,
 GLfloat vertical_field_of_view, GLfloat near_limit, GLfloat far_limit);
-void			load_obj(const char *path, t_parsing_storage *storage);
 void			normalize_obj(GLfloat *vertices, size_t vert_size);
-void			check_vertices_number(t_parsing_storage *storage);
 void			assign_max_min_initial_values(GLfloat *tab, GLfloat val);
 void			determine_tab_diff(GLfloat *tab);
 void			affect_diffs(GLfloat *vertices_sub_tab,
@@ -94,5 +91,11 @@ GLfloat *tab3, void (*func)(GLfloat *tab));
 GLfloat			degrees_to_radians(GLfloat degrees);
 void			gl_check_errors(const char *msg);
 void			*secure_malloc(const size_t len);
+void			change_shaker(GLfloat *shaker);
+void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n);
+void compile_shader(GLenum shader_type, UINT *shader_handle,
+const char *shader_source);
+void check_compilation_step_success(UINT handle,
+void(*getter)(UINT, GLenum, int*), GLenum status);
 
 #endif

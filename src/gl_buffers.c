@@ -13,31 +13,30 @@
 #include "scop.h"
 #include <fcntl.h>
 
+void	parse_texture_coords(const char *file_content, size_t *i, GLfloat **final_vertices, size_t *final_vert_size, const GLfloat *vts, const size_t file_size)
+{
+	int vt_index;
+
+	error_check(sscanf(file_content + (*i),"%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 3, vts + (vt_index - 1) * 2, 2);
+	while(*i != file_size && file_content[*i] != ' ' && file_content[*i] != '\n')
+		(*i)++;
+	(*i)++;
+}
+
 void	parse_face_point(const char *file_content, size_t *i, GLfloat **final_vertices,
 const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size, GLfloat *shaker)
 {
 	int index;
-	int vt_index;
 
 	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 8) * sizeof(GLfloat));
 	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
-	//printf("v pos: %d read at index %lu.\n", index, *i);
-	(*final_vertices)[*final_vert_size] = vertices[(index - 1) * 3];
-	(*final_vertices)[(*final_vert_size) + 1] = vertices[(index - 1) * 3 + 1];
-	(*final_vertices)[(*final_vert_size) + 2] = vertices[(index - 1) * 3 + 2];
+	glfloat_cpy_n((*final_vertices) + (*final_vert_size), vertices + (index - 1) * 3, 3);
 	while (*i < file_size && file_content[*i] != ' ' && file_content[*i] != '/' && file_content[*i] != '\n')
 		(*i)++;
 	(*i)++;
 	if (*i < file_size && file_content[(*i) - 1] == '/')
-	{
-		error_check(sscanf(file_content + (*i),"%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
-		//printf("vt pos: %d.\n", vt_index);
-		(*final_vertices)[(*final_vert_size) + 3] = vts[(vt_index - 1) * 2];
-		(*final_vertices)[(*final_vert_size) + 4] = vts[(vt_index - 1) * 2 + 1];
-		while(*i != file_size && file_content[*i] != ' ' && file_content[*i] != '\n')
-			(*i)++;
-		(*i)++;
-	}
+		parse_texture_coords(file_content, i, final_vertices, final_vert_size, vts, file_size);
 	else
 	{
 		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
@@ -45,7 +44,6 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 	}
 	fill_vec3((*final_vertices) + (*final_vert_size) + 5, *shaker, *shaker, *shaker);
 	change_shaker(shaker);
-	//printf("cursor is now on '%c'.\n", file_content[*i]);
 	if (*i < file_size && file_content[(*i) - 1] == '\n')
 		(*i)--;
 	*final_vert_size += 8;
@@ -58,13 +56,10 @@ const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *fin
 	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 5);
 	fill_vec3((*final_vertices) + (*final_vert_size) + 5, *shaker, *shaker, *shaker);
 	change_shaker(shaker);
-	//printf("just copied this as the first vertex in four face scenario: %f, %f, %f.\n",
 	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 8, (*final_vertices) + (*final_vert_size) - 8, 8);
 	fill_vec3((*final_vertices) + (*final_vert_size) + 13, *shaker, *shaker, *shaker);
 	change_shaker(shaker);
-	//printf("just copied this as the second vertex in four face scenario: %f, %f, %f.\n", (*final_vertices)[(*final_vert_size) + 5], (*final_vertices)[(*final_vert_size) + 6], (*final_vertices)[(*final_vert_size) + 7]);
 	*final_vert_size += 16;
-	//puts("The next given vertex info will be the fourth point of the face.");
 	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, shaker);
 }
 
@@ -73,14 +68,42 @@ char	is_digit(const char c)
 	return (c >= '0' && c <= '9');
 }
 
+void	parse_vertexs_and_text_coords(size_t	file_size, size_t *i, char	*file_content, GLfloat	**vertices, size_t (*vert_size), GLfloat	**vts, size_t	*len_vts)
+{
+	while ((*i) + 1 < file_size)
+	{
+		if (file_content[(*i)] == 'v' && file_content[(*i) + 1] == ' ')
+		{
+			(*i) += 2;
+			(*vertices) = (GLfloat*)realloc((*vertices), ((*vert_size) + 3) * sizeof(GLfloat));
+			if (sscanf(file_content + (*i), "%f %f %f", (*vertices) + (*vert_size), (*vertices) + (*vert_size) + 1, (*vertices) + (*vert_size) + 2) != 3)
+			{
+				puts("Unable to parse vertex.");
+				exit(0);
+			}
+			(*vert_size) += 3;
+		}
+		else if ((*i) + 2 < file_size && file_content[(*i)] == 'v' && file_content[(*i) + 1] == 't' && file_content[(*i) + 2] == ' ')
+		{
+			(*i) += 3;
+			(*vts) = (GLfloat*)realloc((*vts), ((*len_vts) + 2) * sizeof(GLfloat));
+			sscanf(file_content + (*i), "%f %f", (*vts) + (*len_vts), (*vts) + (*len_vts) + 1);
+			(*len_vts) += 2;
+		}
+		while ((*i) != file_size && file_content[(*i)++] != '\n');
+	}
+}
+
 GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 {
+	size_t	len_vts = 0;
 	size_t	file_size, vert_size = 0, final_vert_size = 0;
 	int		fd = open(file_name, O_RDONLY);
 	size_t	i = 0;
 	char	*file_content;
 	GLfloat	*vertices = NULL;
 	GLfloat	shaker = 0.25;
+	GLfloat	*vts = NULL;
 
 	error_check(fd > 0, "Could not read obj file.");
 	file_size = get_file_size(fd);
@@ -92,31 +115,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		puts("Unable to read obj file correctly.");
 		exit(0);
 	}
-	GLfloat	*vts = NULL;
-	size_t	len_vts = 0;
-	while (i + 1 < file_size)
-	{
-		if (file_content[i] == 'v' && file_content[i + 1] == ' ')
-		{
-			i += 2;
-			vertices = (GLfloat*)realloc(vertices, (vert_size + 3) * sizeof(GLfloat));
-			if (sscanf(file_content + i, "%f %f %f", vertices + vert_size, vertices + vert_size + 1, vertices + vert_size + 2) != 3)
-			{
-				puts("Unable to parse vertex.");
-				exit(0);
-			}
-//			printf("At vert index: %lu:\n%f, %f, %f\n", vert_size, vertices[vert_size], vertices[vert_size + 1], vertices[vert_size + 2]);
-			vert_size += 3;
-		}
-		else if (i + 2 < file_size && file_content[i] == 'v' && file_content[i + 1] == 't' && file_content[i + 2] == ' ')
-		{
-			i += 3;
-			vts = (GLfloat*)realloc(vts, (len_vts + 2) * sizeof(GLfloat));
-			sscanf(file_content + i, "%f %f", vts + len_vts, vts + len_vts + 1);
-			len_vts += 2;
-		}
-		while (i != file_size && file_content[i++] != '\n');
-	}
+	parse_vertexs_and_text_coords(file_size, &i, file_content, &vertices, &vert_size, &vts, &len_vts);
 	normalize_obj(vertices, vert_size);
 	i = 0;
 	GLfloat	*final_vertices = NULL;
@@ -138,11 +137,6 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 		while(i != file_size && file_content[i++] != '\n');
 	}
 	i = 0;
-	//while(i != final_vert_size)
-	//{
-		//printf("%f %f %f %f %f\n", final_vertices[i], final_vertices[i + 1], final_vertices[i + 2], final_vertices[i + 3], final_vertices[i + 4]);
-//		i += 8;
-//	}
 	*vertices_len = final_vert_size;
 	free(file_content);
 	if (vertices)

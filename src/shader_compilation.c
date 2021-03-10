@@ -12,7 +12,7 @@
 
 #include <scop.h>
 
-static void check_compilation_step_success(UINT handle,
+void check_compilation_step_success(UINT handle,
 void(*getter)(UINT, GLenum, int*), GLenum status)
 {
 	int success;
@@ -26,7 +26,7 @@ void(*getter)(UINT, GLenum, int*), GLenum status)
 	exit(0);
 }
 
-static void compile_shader(GLenum shader_type, UINT *shader_handle,
+void compile_shader(GLenum shader_type, UINT *shader_handle,
 const char *shader_source)
 {
 	*shader_handle = glCreateShader(shader_type);

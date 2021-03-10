@@ -304,7 +304,6 @@ int			main(int argc, char const *argv[])
 
 	error_check_sdl(SDL_Init(SDL_INIT_VIDEO) >= 0);
 	error_check_sdl(SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1) == 0);
-	puts("Salut");
 	error_check_sdl(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4) == 0);
 	error_check_sdl(SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 4) == 0);
 	error_check_sdl(SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
@@ -315,7 +314,6 @@ int			main(int argc, char const *argv[])
 	error_check_sdl(m.win != NULL);
 	glcontext = SDL_GL_CreateContext(m.win);
 	error_check_sdl(glcontext != NULL);
-	puts("bye");
 	SDL_GL_MakeCurrent(m.win, glcontext);
 	error_check_sdl(SDL_GL_SetSwapInterval(1) == 0);
 	error_check(glewInit() == GLEW_OK, "Failed to load OpenGL Functions.");

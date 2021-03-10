@@ -41,12 +41,3 @@ void	assign_max_min_initial_values(GLfloat *tab, GLfloat val)
 	tab[1] = val;
 	tab[0] = tab[1];
 }
-
-void	check_vertices_number(t_parsing_storage *storage)
-{
-	if (storage->v_nb < 3)
-	{
-		puts("Insufficient number of vertices counted. Stopping now.");
-		exit(0);
-	}
-}
