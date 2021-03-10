@@ -100,6 +100,25 @@ void	handle_events_part_two(SDL_Event *e, t_master *m)
 	}
 }
 
+void	handle_events_part_three(SDL_Event *e, t_master *m)
+{
+	if (e->key.keysym.sym == SDLK_UP)
+	{
+		if (m->relative_coordinates[1] < 2)
+			m->relative_coordinates[1] += 0.1;
+	}
+	else if (e->key.keysym.sym == SDLK_MINUS)
+	{
+		if (m->relative_coordinates[2] > -7)
+			m->relative_coordinates[2] -= 0.5;
+	}
+	else if (e->key.keysym.sym == SDLK_z)
+	{
+		if (m->relative_coordinates[2] < -2)
+			m->relative_coordinates[2] += 0.5;
+	}
+}
+
 void handle_events(char *params, t_master *m)
 {
 	SDL_Event e;
@@ -118,21 +137,7 @@ void handle_events(char *params, t_master *m)
 		{
 			handle_events_part_one(&e, params, m);
 			handle_events_part_two(&e, m);
-			if (e.key.keysym.sym == SDLK_UP)
-			{
-				if (m->relative_coordinates[1] < 2)
-					m->relative_coordinates[1] += 0.1;
-			}
-			else if (e.key.keysym.sym == SDLK_MINUS)
-			{
-				if (m->relative_coordinates[2] > -7)
-					m->relative_coordinates[2] -= 0.5;
-			}
-			else if (e.key.keysym.sym == SDLK_z)
-			{
-				if (m->relative_coordinates[2] < -2)
-					m->relative_coordinates[2] += 0.5;
-			}
+			handle_events_part_three(&e, m);
 			break;
 		}
 	}
@@ -154,24 +159,27 @@ void	normalize(GLfloat *vec)
 void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 {
 	float angle_rad = radian_angle * (3.14159265359/180.0f);
-    float c = cos(angle_rad);
-    float s = sin(angle_rad);
-    float t = 1 - c;
-	normalize(axis);
+	float c;
+	float s;
+	float t;
 
+	normalize(axis);
+	c = cos(angle_rad);
+	s = sin(angle_rad);
+	t = 1 - c;
 	mat4[0] = c + axis[0] * axis[0] * t;
 	mat4[1] = axis[1] * axis[0] * t + axis[2] * s;
 	mat4[2] = axis[2] * axis[0] * t-axis[1] * s;
 	mat4[3] = 0;
-    mat4[4] = axis[0] * axis[1] * t - axis[2] * s;
+	mat4[4] = axis[0] * axis[1] * t - axis[2] * s;
 	mat4[5] = c + axis[1] *axis[1] * t;
 	mat4[6] = axis[2] * axis[1] * t+axis[0] * s;
 	mat4[7] = 0;
-    mat4[8] = axis[0] * axis[2] * t + axis[1] * s;
+	mat4[8] = axis[0] * axis[2] * t + axis[1] * s;
 	mat4[9] = axis[1] * axis[2] * t - axis[0] * s;
 	mat4[10] = axis[2] * axis[2] * t + c;
 	mat4[11] = 0;
-    mat4[12] = 0;
+	mat4[12] = 0;
 	mat4[13] = 0;
 	mat4[14] = 0;
 	mat4[15] = 1;
@@ -179,37 +187,30 @@ void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 
 static void render_frame(UINT *handles, UINT texture, size_t len, t_master *m)
 {
-	const unsigned int SCR_WIDTH = 800;
-	const unsigned int SCR_HEIGHT = 600;
 	GLfloat	home_model[16];
-	GLfloat *home_view;
-	GLfloat *home_proj;
-	GLuint	transition_handle;
+	GLfloat	*home_view;
+	GLfloat	*home_proj;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl_check_errors("glClear");
 	glBindTexture(GL_TEXTURE_2D, texture);
 	gl_check_errors("glBindTexture");
-	//create transformations
 	rotation_mat4(home_model, ((float)SDL_GetTicks() / 1000) * 50.0f, m->rotation_axis);
 	home_view = translation_mat4(m->relative_coordinates[0], m->relative_coordinates[1], m->relative_coordinates[2]);
-	home_proj = perspective_mat4((float)SCR_WIDTH / (float)SCR_HEIGHT, degrees_to_radians(45), 0.1f, 100.0f);
-	// pass them to the shaders (3 different ways)
+	home_proj = perspective_mat4((float)800 / (float)600, degrees_to_radians(45), 0.1f, 100.0f);
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "model"), 1, GL_FALSE, home_model);
 	gl_check_errors("glUniformMatrix4fv 1");
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "view"), 1, GL_FALSE, home_view);
 	gl_check_errors("glUniformMatrix4fv 2");
 	glUniformMatrix4fv(glGetUniformLocation(handles[3], "projection"), 1, GL_FALSE, home_proj);
 	gl_check_errors("glUniformMatrix4fv 3");
-	transition_handle = glGetUniformLocation(handles[3], "transition_degree");
 	gl_check_errors("glGetUniformLocation");
-	glUniform1f(transition_handle, m->transition_state);
+	glUniform1f(glGetUniformLocation(handles[3], "transition_degree"), m->transition_state);
 	gl_check_errors("glUniform1f");
 	glDrawArrays(GL_TRIANGLES, 0, len);
 	gl_check_errors("glDrawArrays");
 	free(home_view);
 	free(home_proj);
-	//loop_nb++;//TO_DELETE
 }
 
 unsigned char	*load_bmp(const char *file_path, int *width, int *height)
