@@ -1,6 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   common.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: overetou <overetou@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/10 13:47:56 by overetou          #+#    #+#             */
+/*   Updated: 2021/03/10 13:58:59 by overetou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "scop.h"
 
-//Returns the reallocated pointer or stop the program after a free if error.
 void	*secure_realloc(void *to_realloc, size_t new_size)
 {
 	void	*temp;

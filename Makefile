@@ -13,7 +13,7 @@ CFLAGS=-Wall -Wextra -Werror
 LIBS=SDL2 GL GLEW m#m stands for mathlib
 
 #From there we use the info to compile everything.
-SRC_FILE_NAMES = cleaning.c main.c process_args.c gl_buffers.c loader.c matrix_basics.c matrix_gen.c matrix_mult.c vectors.c trio_simplification.c common.c
+SRC_FILE_NAMES = cleaning.c main.c process_args.c gl_buffers.c loader.c matrix_basics.c matrix_gen.c vectors.c trio_simplification.c common.c shader_compilation.c
 SOURCES=$(addprefix $(SRC_DIR)/, $(SRC_FILE_NAMES))
 OBJS:=$(SOURCES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 INC_FLAGS=$(addprefix -I,$(INC_DIRS))
