@@ -251,7 +251,6 @@ void init_render(t_master *m)
 	m->direction = 0;
 	UINT handles[6];
 	char params[2];
-	//int uniform_location;
 
 	params[0] = 1;
 	params[1] = 0;
@@ -272,19 +271,15 @@ void init_render(t_master *m)
 	gl_check_errors("glActiveTexture");
 	glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 	gl_check_errors("glBindTextures");
-	// set the texture wrapping parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
 	gl_check_errors("glTexParameteri 1");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	gl_check_errors("glTexParameteri 2");
-	// set texture filtering parameters
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	gl_check_errors("glTexParameteri 3");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	gl_check_errors("glTexParameteri 4");
-	// load image, create texture and generate mipmaps
 	int width, height;
-	// The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
 	unsigned char *data = load_bmp(m->text_file_path, &width, &height);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
 	gl_check_errors("glTexImage2D");
