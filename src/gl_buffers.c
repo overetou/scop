@@ -13,54 +13,52 @@
 #include "scop.h"
 #include <fcntl.h>
 
-void	parse_texture_coords(const char *file_content, size_t *i, GLfloat **final_vertices, size_t *final_vert_size, const GLfloat *vts, const size_t file_size)
+void	parse_texture_coords(t_parsing_storage *st)
 {
 	int vt_index;
 
-	error_check(sscanf(file_content + (*i),"%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 3, vts + (vt_index - 1) * 2, 2);
-	while(*i != file_size && file_content[*i] != ' ' && file_content[*i] != '\n')
-		(*i)++;
-	(*i)++;
+	error_check(sscanf(st->file_content + (st->i),"%i", &vt_index) == 1, "/ in face declaration of obj file is not folowed by a value.");
+	glfloat_cpy_n((st->final_vertices) + (st->final_vert_size) + 3, st->vts + (vt_index - 1) * 2, 2);
+	while(st->i != st->file_size && st->file_content[st->i] != ' ' && st->file_content[st->i] != '\n')
+		(st->i)++;
+	(st->i)++;
 }
 
-void	parse_face_point(const char *file_content, size_t *i, GLfloat **final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size, GLfloat *shaker)
+void	parse_face_point(t_parsing_storage *st)
 {
 	int index;
 
-	(*final_vertices) = (GLfloat*)realloc((*final_vertices), ((*final_vert_size) + 8) * sizeof(GLfloat));
-	error_check(sscanf(file_content + (*i), "%i", &index) == 1, "Wrong obj file format.");
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size), vertices + (index - 1) * 3, 3);
-	while (*i < file_size && file_content[*i] != ' ' && file_content[*i] != '/' && file_content[*i] != '\n')
-		(*i)++;
-	(*i)++;
-	if (*i < file_size && file_content[(*i) - 1] == '/')
-		parse_texture_coords(file_content, i, final_vertices, final_vert_size, vts, file_size);
+	(st->final_vertices) = (GLfloat*)realloc((st->final_vertices), ((st->final_vert_size) + 8) * sizeof(GLfloat));
+	error_check(sscanf(st->file_content + (st->i), "%i", &index) == 1, "Wrong obj file format.");
+	glfloat_cpy_n((st->final_vertices) + (st->final_vert_size), st->vertices + (index - 1) * 3, 3);
+	while (st->i < st->file_size && st->file_content[st->i] != ' ' && st->file_content[st->i] != '/' && st->file_content[st->i] != '\n')
+		(st->i)++;
+	(st->i)++;
+	if (st->i < st->file_size && st->file_content[(st->i) - 1] == '/')
+		parse_texture_coords(st);
 	else
 	{
-		(*final_vertices)[(*final_vert_size) + 3] = (*final_vertices)[*final_vert_size] + (*final_vertices)[(*final_vert_size) + 2];
-		(*final_vertices)[(*final_vert_size) + 4] = (*final_vertices)[(*final_vert_size) + 1] + (*final_vertices)[(*final_vert_size) + 2];
+		(st->final_vertices)[(st->final_vert_size) + 3] = (st->final_vertices)[st->final_vert_size] + (st->final_vertices)[(st->final_vert_size) + 2];
+		(st->final_vertices)[(st->final_vert_size) + 4] = (st->final_vertices)[(st->final_vert_size) + 1] + (st->final_vertices)[(st->final_vert_size) + 2];
 	}
-	fill_vec3((*final_vertices) + (*final_vert_size) + 5, *shaker, *shaker, *shaker);
-	change_shaker(shaker);
-	if (*i < file_size && file_content[(*i) - 1] == '\n')
-		(*i)--;
-	*final_vert_size += 8;
+	fill_vec3((st->final_vertices) + (st->final_vert_size) + 5, st->shaker, st->shaker, st->shaker);
+	change_shaker(st);
+	if (st->i < st->file_size && st->file_content[(st->i) - 1] == '\n')
+		(st->i)--;
+	st->final_vert_size += 8;
 }
 
-void	handle_fourth_face(const char *file_content, size_t *i, GLfloat **final_vertices,
-const GLfloat *vertices, const GLfloat *vts, const size_t file_size, size_t *final_vert_size, GLfloat *shaker)
+void	handle_fourth_face(t_parsing_storage *st)
 {
-	*final_vertices = (GLfloat*)realloc(*final_vertices, ((*final_vert_size) + 16) * sizeof(GLfloat));
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size), (*final_vertices) + (*final_vert_size) - 24, 5);
-	fill_vec3((*final_vertices) + (*final_vert_size) + 5, *shaker, *shaker, *shaker);
-	change_shaker(shaker);
-	glfloat_cpy_n((*final_vertices) + (*final_vert_size) + 8, (*final_vertices) + (*final_vert_size) - 8, 8);
-	fill_vec3((*final_vertices) + (*final_vert_size) + 13, *shaker, *shaker, *shaker);
-	change_shaker(shaker);
-	*final_vert_size += 16;
-	parse_face_point(file_content, i, final_vertices, vertices, vts, file_size, final_vert_size, shaker);
+	st->final_vertices = (GLfloat*)realloc(st->final_vertices, ((st->final_vert_size) + 16) * sizeof(GLfloat));
+	glfloat_cpy_n((st->final_vertices) + (st->final_vert_size), (st->final_vertices) + (st->final_vert_size) - 24, 5);
+	fill_vec3((st->final_vertices) + (st->final_vert_size) + 5, st->shaker, st->shaker, st->shaker);
+	change_shaker(st);
+	glfloat_cpy_n((st->final_vertices) + (st->final_vert_size) + 8, (st->final_vertices) + (st->final_vert_size) - 8, 8);
+	fill_vec3((st->final_vertices) + (st->final_vert_size) + 13, st->shaker, st->shaker, st->shaker);
+	change_shaker(st);
+	st->final_vert_size += 16;
+	parse_face_point(st);
 }
 
 char	is_digit(const char c)
@@ -68,82 +66,74 @@ char	is_digit(const char c)
 	return (c >= '0' && c <= '9');
 }
 
-void	parse_vertexs_and_text_coords(size_t	file_size, size_t *i, char	*file_content, GLfloat	**vertices, size_t (*vert_size), GLfloat	**vts, size_t	*len_vts)
+void	parse_vertexs_and_text_coords(t_parsing_storage *st)
 {
-	while ((*i) + 1 < file_size)
+	while (st->i + 1 < st->file_size)
 	{
-		if (file_content[(*i)] == 'v' && file_content[(*i) + 1] == ' ')
+		if (st->file_content[st->i] == 'v' && st->file_content[(st->i) + 1] == ' ')
 		{
-			(*i) += 2;
-			(*vertices) = (GLfloat*)realloc((*vertices), ((*vert_size) + 3) * sizeof(GLfloat));
-			if (sscanf(file_content + (*i), "%f %f %f", (*vertices) + (*vert_size), (*vertices) + (*vert_size) + 1, (*vertices) + (*vert_size) + 2) != 3)
+			st->i += 2;
+			st->vertices = (GLfloat*)realloc(st->vertices, ((st->vert_size) + 3) * sizeof(GLfloat));
+			if (sscanf(st->file_content + st->i, "%f %f %f",
+			(st->vertices) + (st->vert_size), (st->vertices) + (st->vert_size) + 1,
+			(st->vertices) + (st->vert_size) + 2) != 3)
 			{
 				puts("Unable to parse vertex.");
 				exit(0);
 			}
-			(*vert_size) += 3;
+			st->vert_size += 3;
 		}
-		else if ((*i) + 2 < file_size && file_content[(*i)] == 'v' && file_content[(*i) + 1] == 't' && file_content[(*i) + 2] == ' ')
+		else if ((st->i) + 2 < st->file_size && st->file_content[st->i] == 'v' && st->file_content[(st->i) + 1] == 't' && st->file_content[(st->i) + 2] == ' ')
 		{
-			(*i) += 3;
-			(*vts) = (GLfloat*)realloc((*vts), ((*len_vts) + 2) * sizeof(GLfloat));
-			sscanf(file_content + (*i), "%f %f", (*vts) + (*len_vts), (*vts) + (*len_vts) + 1);
-			(*len_vts) += 2;
+			st->i += 3;
+			(st->vts) = (GLfloat*)realloc(st->vts, ((st->len_vts) + 2) * sizeof(GLfloat));
+			sscanf(st->file_content + st->i, "%f %f", (st->vts) + (st->len_vts), (st->vts) + (st->len_vts) + 1);
+			st->len_vts += 2;
 		}
-		while ((*i) != file_size && file_content[(*i)++] != '\n');
+		while (st->i != st->file_size && st->file_content[(st->i)++] != '\n');
 	}
 }
 
 GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 {
-	size_t	len_vts = 0;
-	size_t	file_size, vert_size = 0, final_vert_size = 0;
+	t_parsing_storage	st;
 	int		fd = open(file_name, O_RDONLY);
-	size_t	i = 0;
-	char	*file_content;
-	GLfloat	*vertices = NULL;
-	GLfloat	shaker = 0.25;
-	GLfloat	*vts = NULL;
 
+	st.shaker = 0.25;
+	bzero(&st, sizeof(st));
 	error_check(fd > 0, "Could not read obj file.");
-	file_size = get_file_size(fd);
-	//printf("File size = %lu.\n", file_size);
-	file_content = (char*)secure_malloc(file_size + 1);
-	file_content[file_size] = '\0';
-	if (read(fd, file_content, file_size) != (ssize_t)file_size)
+	st.file_size = get_file_size(fd);
+	st.file_content = (char*)secure_malloc(st.file_size + 1);
+	(st.file_content)[st.file_size] = '\0';
+	if (read(fd, st.file_content, st.file_size) != (ssize_t)(st.file_size))
 	{
 		puts("Unable to read obj file correctly.");
 		exit(0);
 	}
-	parse_vertexs_and_text_coords(file_size, &i, file_content, &vertices, &vert_size, &vts, &len_vts);
-	normalize_obj(vertices, vert_size);
-	i = 0;
-	GLfloat	*final_vertices = NULL;
-	while (i + 1 < file_size)
+	parse_vertexs_and_text_coords(&st);
+	normalize_obj(st.vertices, st.vert_size);
+	st.i = 0;
+	while ((st.i) + 1 < st.file_size)
 	{
-		if (file_content[i] == 'f' && file_content[i + 1] == ' ')
+		if (st.file_content[st.i] == 'f' && st.file_content[(st.i) + 1] == ' ')
 		{
-			i += 2;
-			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &shaker);
-			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &shaker);
-			parse_face_point(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &shaker);
-			if (i < file_size && is_digit(file_content[i]))
-				handle_fourth_face(file_content, &i, &final_vertices, vertices, vts, file_size,
-			&final_vert_size, &shaker);
+			st.i += 2;
+			parse_face_point(&st);
+			parse_face_point(&st);
+			parse_face_point(&st);
+			if (st.i < st.file_size && is_digit(st.file_content[st.i]))
+				handle_fourth_face(&st);
 		}
-		while(i != file_size && file_content[i++] != '\n');
+		while(st.i != st.file_size && st.file_content[(st.i)++] != '\n');
 	}
-	i = 0;
-	*vertices_len = final_vert_size;
-	free(file_content);
-	if (vertices)
-		free(vertices);
-	if (vts)
-		free(vts);
-	return (final_vertices);
+	st.i = 0;
+	*vertices_len = st.final_vert_size;
+	free(st.file_content);
+	if (st.vertices)
+		free(st.vertices);
+	if (st.vts)
+		free(st.vts);
+	return (st.final_vertices);
 }
 
 /*

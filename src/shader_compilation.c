@@ -48,10 +48,10 @@ void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n)
 	}
 }
 
-void	change_shaker(GLfloat *shaker)
+void	change_shaker(t_parsing_storage *st)
 {
-	if (*shaker < 0.55)
-		*shaker += 0.02;
+	if (st->shaker < 0.55)
+		st->shaker += 0.02;
 	else
-		*shaker = 0.25;
+		st->shaker = 0.25;
 }

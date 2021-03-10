@@ -60,9 +60,16 @@ typedef struct	s_master
 
 typedef struct	s_parsing_storage
 {
-	size_t	file_size;
-	size_t	vert_size;
-	size_t	final_vert_size;
+	size_t		file_size;
+	size_t		vert_size;
+	size_t		final_vert_size;
+	size_t		len_vts;
+	size_t		i;
+	GLfloat		*vertices;
+	GLfloat		*final_vertices;
+	GLfloat		*vts;
+	char		*file_content;
+	GLfloat		shaker;
 }				t_parsing_storage;
 
 void			process_args(const int argc, const char *argv[], t_master *m);
@@ -91,7 +98,7 @@ GLfloat *tab3, void (*func)(GLfloat *tab));
 GLfloat			degrees_to_radians(GLfloat degrees);
 void			gl_check_errors(const char *msg);
 void			*secure_malloc(const size_t len);
-void			change_shaker(GLfloat *shaker);
+void			change_shaker(t_parsing_storage *st);
 void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n);
 void compile_shader(GLenum shader_type, UINT *shader_handle,
 const char *shader_source);
