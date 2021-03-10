@@ -45,6 +45,61 @@ void		error_check(char val, const char *msg)
 	exit(0);
 }
 
+void	handle_events_part_one(SDL_Event *e, char *params, t_master *m)
+{
+	if (e->key.keysym.sym == SDLK_ESCAPE)
+		*params = 0;
+	else if (e->key.keysym.sym == SDLK_w)
+	{
+		if (params[1])
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			gl_check_errors("glPolygonMode");
+		}
+		else
+		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			gl_check_errors("glPolygonMode 2");
+		}
+		params[1] = !(params[1]);
+	}
+	else if (e->key.keysym.sym == SDLK_t && m->transition_time_marker == 0)
+	{
+		if (m->direction)
+			m->direction = 0;
+		else
+			m->direction = 1;
+		m->transition_time_marker = SDL_GetTicks();
+	}
+}
+
+void	handle_events_part_two(SDL_Event *e, t_master *m)
+{
+	if (e->key.keysym.sym == SDLK_c)
+		fill_vec3(m->rotation_axis, 0.0, 1.0, 0.0);
+	else if (e->key.keysym.sym == SDLK_p)
+		fill_vec3(m->rotation_axis, 0.0, 0.0, 1.0);
+	else if (e->key.keysym.sym == SDLK_f)
+		fill_vec3(m->rotation_axis, 1.0, 0.0, 0.0);
+	else if (e->key.keysym.sym == SDLK_m)
+		fill_vec3(m->rotation_axis, 0.1, 1.0, 1.0);
+	else if (e->key.keysym.sym == SDLK_LEFT)
+	{
+		if (m->relative_coordinates[0] > -2)
+			m->relative_coordinates[0] -= 0.1;
+	}
+	else if (e->key.keysym.sym == SDLK_RIGHT)
+	{
+		if (m->relative_coordinates[0] < 2)
+			m->relative_coordinates[0] += 0.1;
+	}
+	else if (e->key.keysym.sym == SDLK_DOWN)
+	{
+		if (m->relative_coordinates[1] > -2)
+			m->relative_coordinates[1] -= 0.1;
+	}
+}
+
 void handle_events(char *params, t_master *m)
 {
 	SDL_Event e;
@@ -61,54 +116,9 @@ void handle_events(char *params, t_master *m)
 		}
 		else if (e.type == SDL_KEYDOWN)
 		{
-			if (e.key.keysym.sym == SDLK_ESCAPE)
-				*params = 0;
-			else if (e.key.keysym.sym == SDLK_w)
-			{
-				if (params[1])
-				{
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-					gl_check_errors("glPolygonMode");
-				}
-				else
-				{
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-					gl_check_errors("glPolygonMode 2");
-				}
-				params[1] = !(params[1]);
-			}
-			else if (e.key.keysym.sym == SDLK_t && m->transition_time_marker == 0)
-			{
-				if (m->direction)
-					m->direction = 0;
-				else
-					m->direction = 1;
-				m->transition_time_marker = SDL_GetTicks();
-			}
-			else if (e.key.keysym.sym == SDLK_c)
-				fill_vec3(m->rotation_axis, 0.0, 1.0, 0.0);
-			else if (e.key.keysym.sym == SDLK_p)
-				fill_vec3(m->rotation_axis, 0.0, 0.0, 1.0);
-			else if (e.key.keysym.sym == SDLK_f)
-				fill_vec3(m->rotation_axis, 1.0, 0.0, 0.0);
-			else if (e.key.keysym.sym == SDLK_m)
-				fill_vec3(m->rotation_axis, 0.1, 1.0, 1.0);
-			else if (e.key.keysym.sym == SDLK_LEFT)
-			{
-				if (m->relative_coordinates[0] > -2)
-					m->relative_coordinates[0] -= 0.1;
-			}
-			else if (e.key.keysym.sym == SDLK_RIGHT)
-			{
-				if (m->relative_coordinates[0] < 2)
-					m->relative_coordinates[0] += 0.1;
-			}
-			else if (e.key.keysym.sym == SDLK_DOWN)
-			{
-				if (m->relative_coordinates[1] > -2)
-					m->relative_coordinates[1] -= 0.1;
-			}
-			else if (e.key.keysym.sym == SDLK_UP)
+			handle_events_part_one(&e, params, m);
+			handle_events_part_two(&e, m);
+			if (e.key.keysym.sym == SDLK_UP)
 			{
 				if (m->relative_coordinates[1] < 2)
 					m->relative_coordinates[1] += 0.1;
