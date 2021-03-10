@@ -215,28 +215,24 @@ static void render_frame(UINT *handles, UINT texture, size_t len, t_master *m)
 
 unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 {
-	unsigned char header[54];
-	size_t dataPos = 0;
-	ssize_t imageSize = 0;
-	unsigned char *data;
-	int	fd;
+	unsigned char	header[54];
+	size_t			dataPos;
+	unsigned char	*data;
+	int				fd;
 
 	fd = open(file_path, O_RDONLY);
+	dataPos = 0;
 	error_check(fd > 0, "Could not open the bmp file.");
 	error_check(read(fd, header, 54) == 54, "The file is not big enough to be formatted with bmp standards.");
 	error_check(header[0] == 'B' && header[1] == 'M', "BMP file should begin with BM");
 	dataPos = *(int*)&(header[0x0A]);
-	imageSize= *(int*)&(header[0x22]);
 	*width= *(int*)&(header[0x12]);
 	*height = *(int*)&(header[0x16]);
-	if (imageSize==0)
-		imageSize = (*width) * (*height) * 3;
 	if (dataPos==0)
 		dataPos=54;
 	lseek(fd, dataPos, SEEK_SET);
-	
-	data = (unsigned char*)secure_malloc(imageSize);
-	error_check(read(fd, data, imageSize) == imageSize, "Could not read the size specified in the bmp file header.");
+	data = (unsigned char*)secure_malloc(*(int*)&(header[0x22]));
+	error_check(read(fd, data, *(int*)&(header[0x22])) == *(int*)&(header[0x22]), "Could not read the size specified in the bmp file header.");
 	close(fd);
 	return (data);
 }
