@@ -56,6 +56,7 @@ typedef struct	s_master
 	char		direction;
 	GLfloat		rotation_axis[3];
 	GLfloat		relative_coordinates[3];
+	size_t		len;
 }				t_master;
 
 typedef struct	s_parsing_storage

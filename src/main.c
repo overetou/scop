@@ -258,7 +258,7 @@ void init_render(t_master *m)
 	gl_check_errors("glViewport");
 	glClearColor(0.3, 0.3, 0.4, 1);
 	gl_check_errors("glClearColor");
-	size_t len = allocate_graphic_side_objects(handles, m);
+	m->len = allocate_graphic_side_objects(handles, m);
 	
 	unsigned int texture;
 	glGenTextures(1, &texture);
@@ -288,7 +288,7 @@ void init_render(t_master *m)
 	{
 		if (m->transition_time_marker)
 			handle_smooth_transition(m, SDL_GetTicks());
-		render_frame(handles, texture, len, m);
+		render_frame(handles, texture, m->len, m);
 		SDL_GL_SwapWindow(m->win);
 		handle_events(params, m);
 	}
