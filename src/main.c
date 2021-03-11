@@ -246,18 +246,14 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 */
 void init_render(t_master *m)
 {
-	m->transition_time_marker = 0;
-	m->transition_state = 0;
-	m->direction = 0;
 	UINT handles[6];
 	char params[2];
 
+	bzero(&(m->transition_time_marker), sizeof(GLuint) + sizeof(GLfloat) + sizeof(char));
 	params[0] = 1;
 	params[1] = 0;
 	fill_vec3(m->rotation_axis, 0.0, 1.0, 0.0);
-	m->relative_coordinates[0] = 0;
-	m->relative_coordinates[1] = 0;
-	m->relative_coordinates[2] = -3;
+	fill_vec3(m->relative_coordinates, 0, 0, -3);
 	glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 	gl_check_errors("glViewport");
 	glClearColor(0.3, 0.3, 0.4, 1);
