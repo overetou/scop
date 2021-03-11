@@ -237,18 +237,8 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 	return (data);
 }
 
-/*
-**handles: 0-raw_vertices_data_handle, 1-vertex_shader_handle, 2-fragment
-**_shader_handle, 3-shader_program, 4-vertexArrayObject	5-EBO
-**Those handles are handles on the graphic card memory.
-**params[0] = keep_going
-**params[1] = wireframe mode enabled
-*/
-void init_render(t_master *m)
+void	init_render_step_one(t_master *m, char *params, UINT *handles)
 {
-	UINT handles[6];
-	char params[2];
-
 	bzero(&(m->transition_time_marker), sizeof(GLuint) + sizeof(GLfloat) + sizeof(char));
 	params[0] = 1;
 	params[1] = 0;
@@ -273,6 +263,21 @@ void init_render(t_master *m)
 	gl_check_errors("glTexParameteri 3");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	gl_check_errors("glTexParameteri 4");
+}
+
+/*
+**handles: 0-raw_vertices_data_handle, 1-vertex_shader_handle, 2-fragment
+**_shader_handle, 3-shader_program, 4-vertexArrayObject	5-EBO
+**Those handles are handles on the graphic card memory.
+**params[0] = keep_going
+**params[1] = wireframe mode enabled
+*/
+void init_render(t_master *m)
+{
+	UINT handles[6];
+	char params[2];
+
+	init_render_step_one(m, params, handles);
 	m->data = load_bmp(m->text_file_path, &(m->width), &(m->height));
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m->width, m->height, 0, GL_BGR, GL_UNSIGNED_BYTE, m->data);
 	gl_check_errors("glTexImage2D");
