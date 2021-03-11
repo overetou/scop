@@ -6,7 +6,7 @@
 /*   By: overetou <overetou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/10 13:46:02 by overetou          #+#    #+#             */
-/*   Updated: 2021/03/10 13:46:04 by overetou         ###   ########.fr       */
+/*   Updated: 2021/03/11 17:21:00 by overetou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void	handle_events_part_three(SDL_Event *e, t_master *m)
 	}
 }
 
-void handle_events(char *params, t_master *m)
+void	handle_events(char *params, t_master *m)
 {
 	SDL_Event e;
 

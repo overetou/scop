@@ -6,7 +6,7 @@
 /*   By: overetou <overetou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/10 13:49:51 by overetou          #+#    #+#             */
-/*   Updated: 2021/03/10 13:49:52 by overetou         ###   ########.fr       */
+/*   Updated: 2021/03/11 17:08:38 by overetou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,6 @@ static int	str_len(const char *s)
 	return (i);
 }
 
-/*
-**Returns true if string are the same.
-*/
 static char	str_cmp_n(const char *s1, const char *s2, int len1, int len2)
 {
 	int i;
@@ -35,7 +32,7 @@ static char	str_cmp_n(const char *s1, const char *s2, int len1, int len2)
 	while (i != len1)
 	{
 		if (s1[i] != s2[i])
-			return(0);
+			return (0);
 		i++;
 	}
 	return (1);
@@ -48,11 +45,14 @@ void		check_and_fill_args(const char *argv[], t_master *m)
 	len = str_len(argv[1]);
 	error_check(argv[1][len - 1] == 'j' &&
 	argv[1][len - 2] == 'b' && argv[1][len - 3] == 'o' &&
-	argv[1][len - 4] == '.', "Expected a file with the extension '.obj' as first argument.");
+	argv[1][len - 4] == '.',
+	"Expected a file with the extension '.obj' as first argument.");
 	m->obj_file_path = argv[1];
 	len = str_len(argv[2]);
-	error_check(argv[2][len - 1] == 'p' && argv[2][len - 2] == 'm' && argv[2][len - 3] == 'b' &&
-	argv[2][len - 4] == '.', "Expected a file with the extension '.bmp' as second argument.");
+	error_check(argv[2][len - 1] == 'p' && argv[2][len - 2] ==
+	'm' && argv[2][len - 3] == 'b' &&
+	argv[2][len - 4] == '.',
+	"Expected a file with the extension '.bmp' as second argument.");
 	m->text_file_path = argv[2];
 }
 

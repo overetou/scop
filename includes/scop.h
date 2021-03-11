@@ -61,6 +61,8 @@ typedef struct		s_master
 	int				height;
 	unsigned char	*data;
 	GLuint			texture;
+	size_t			vertices_len;
+	GLfloat 		*home_vertices;
 }					t_master;
 
 typedef struct	s_parsing_storage
