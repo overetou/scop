@@ -46,18 +46,22 @@
 
 /* "    FragColor = texture(ourTexture, TexCoord);\n"\ */
 
-typedef struct	s_master
+typedef struct		s_master
 {
-	SDL_Window	*win;
-	const char	*obj_file_path;
-	const char	*text_file_path;
-	GLuint		transition_time_marker;
-	GLfloat		transition_state;
-	char		direction;
-	GLfloat		rotation_axis[3];
-	GLfloat		relative_coordinates[3];
-	size_t		len;
-}				t_master;
+	SDL_Window		*win;
+	const char		*obj_file_path;
+	const char		*text_file_path;
+	GLuint			transition_time_marker;
+	GLfloat			transition_state;
+	char			direction;
+	GLfloat			rotation_axis[3];
+	GLfloat			relative_coordinates[3];
+	size_t			len;
+	int				width;
+	int				height;
+	unsigned char	*data;
+	GLuint			texture;
+}					t_master;
 
 typedef struct	s_parsing_storage
 {

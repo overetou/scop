@@ -259,13 +259,11 @@ void init_render(t_master *m)
 	glClearColor(0.3, 0.3, 0.4, 1);
 	gl_check_errors("glClearColor");
 	m->len = allocate_graphic_side_objects(handles, m);
-	
-	unsigned int texture;
-	glGenTextures(1, &texture);
+	glGenTextures(1, &(m->texture));
 	gl_check_errors("glGenTextures");
 	glActiveTexture(GL_TEXTURE0);
 	gl_check_errors("glActiveTexture");
-	glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+	glBindTexture(GL_TEXTURE_2D, m->texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
 	gl_check_errors("glBindTextures");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
 	gl_check_errors("glTexParameteri 1");
@@ -275,20 +273,19 @@ void init_render(t_master *m)
 	gl_check_errors("glTexParameteri 3");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	gl_check_errors("glTexParameteri 4");
-	int width, height;
-	unsigned char *data = load_bmp(m->text_file_path, &width, &height);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+	m->data = load_bmp(m->text_file_path, &(m->width), &(m->height));
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m->width, m->height, 0, GL_BGR, GL_UNSIGNED_BYTE, m->data);
 	gl_check_errors("glTexImage2D");
 	glGenerateMipmap(GL_TEXTURE_2D);
 	gl_check_errors("glGenerateMipmap");
-	free(data);
+	free(m->data);
 	glEnable(GL_DEPTH_TEST);
 	gl_check_errors("glEnable GL_DEPTH_TEST");
 	while (params[0]) 
 	{
 		if (m->transition_time_marker)
 			handle_smooth_transition(m, SDL_GetTicks());
-		render_frame(handles, texture, m->len, m);
+		render_frame(handles, m->texture, m->len, m);
 		SDL_GL_SwapWindow(m->win);
 		handle_events(params, m);
 	}
