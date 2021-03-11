@@ -1,3 +1,14 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   scop.h                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: overetou <overetou@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/03/11 17:56:43 by overetou          #+#    #+#             */
+/*   Updated: 2021/03/11 18:00:07 by overetou         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #ifndef SCOP_H
 # define SCOP_H
@@ -9,10 +20,9 @@
 # include <unistd.h>
 # include <time.h>
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
-#define UINT unsigned int
-#define VERTEX_SHADER_SOURCE "#version 440 core\n"\
+# define WINDOW_WIDTH 800
+# define WINDOW_HEIGHT 600
+# define VERTEX_SHADER_SOURCE "#version 440 core\n"\
 "layout (location = 0) in vec3 aPos;\n"\
 "layout (location = 1) in vec2 aTexCoord;\n"\
 "layout (location = 2) in vec3 colors;\n"\
@@ -63,6 +73,8 @@ typedef struct		s_master
 	GLuint			texture;
 	size_t			vertices_len;
 	GLfloat 		*home_vertices;
+	GLfloat			*home_view;
+	GLfloat			*home_proj;
 }					t_master;
 
 typedef struct	s_parsing_storage
@@ -81,8 +93,8 @@ typedef struct	s_parsing_storage
 
 void			process_args(const int argc, const char *argv[], t_master *m);
 void			error_check(char val, const char *msg);
-size_t			allocate_graphic_side_objects(UINT *handles, t_master *m);
-void			desallocate_graphic_side_objects(UINT *handles);
+size_t			allocate_graphic_side_objects(unsigned int *handles, t_master *m);
+void			desallocate_graphic_side_objects(unsigned int *handles);
 GLfloat			*identity_mat4(void);
 unsigned int	get_file_size(int fd);
 GLfloat			vector_length(GLfloat *vec3);
@@ -106,10 +118,10 @@ GLfloat			degrees_to_radians(GLfloat degrees);
 void			gl_check_errors(const char *msg);
 void			*secure_malloc(const size_t len);
 void			change_shaker(t_parsing_storage *st);
-void	glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n);
-void compile_shader(GLenum shader_type, UINT *shader_handle,
-const char *shader_source);
-void check_compilation_step_success(UINT handle,
-void(*getter)(UINT, GLenum, int*), GLenum status);
+void			glfloat_cpy_n(GLfloat *dest, const GLfloat *src, size_t n);
+void 			compile_shader(GLenum shader_type, unsigned int *shader_handle,
+const char 		*shader_source);
+void 			check_compilation_step_success(unsigned int handle,
+void (*getter)(unsigned int, GLenum, int*), GLenum status);
 
 #endif

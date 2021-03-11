@@ -6,7 +6,7 @@
 /*   By: overetou <overetou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/03/10 13:46:21 by overetou          #+#    #+#             */
-/*   Updated: 2021/03/10 13:58:19 by overetou         ###   ########.fr       */
+/*   Updated: 2021/03/11 17:48:58 by overetou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,21 @@ void	gl_check_errors(const char *msg)
 	{
 		printf("Error code: %x at step: %s.\n", code, msg);
 		exit(0);
+	}
+}
+
+void	handle_smooth_transition(t_master *render_data, GLuint time)
+{
+	if (render_data->transition_time_marker + 5000 > time)
+	{
+		render_data->transition_state = 1.0f /
+		(5000.0f / (float)(time - render_data->transition_time_marker));
+		if (render_data->direction == 0)
+			render_data->transition_state = 1 - render_data->transition_state;
+	}
+	else
+	{
+		render_data->transition_state = (float)(render_data->direction);
+		render_data->transition_time_marker = 0;
 	}
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   matrix_basics.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: overetou <overetou@42.student.fr>          +#+  +:+       +#+        */
+/*   By: overetou <overetou@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/06/20 13:49:30 by overetou          #+#    #+#             */
-/*   Updated: 2020/06/23 17:18:07 by overetou         ###   ########.fr       */
+/*   Updated: 2021/03/11 17:54:56 by overetou         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,10 @@ GLfloat vertical_field_of_view, GLfloat near_limit, GLfloat far_limit)
 	return (result);
 }
 
-GLfloat	degrees_to_radians(GLfloat degrees)
+void	error_check_sdl(char val)
 {
-	return (degrees * M_PI / 180);
+	if (val)
+		return ;
+	puts(SDL_GetError());
+	exit(0);
 }
