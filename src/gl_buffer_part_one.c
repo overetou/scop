@@ -16,6 +16,7 @@ void	parse_face_point(t_parsing_storage *st)
 {
 	int index;
 
+	error_check(st->file_content[(st->i) - 1] != '\n', "Invalid obj file.");
 	(st->final_vertices) = (GLfloat*)realloc((st->final_vertices),
 	((st->final_vert_size) + 8) * sizeof(GLfloat));
 	error_check(sscanf(st->file_content + (st->i), "%i", &index) == 1,
