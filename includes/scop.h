@@ -114,7 +114,6 @@ void			affect_diffs(GLfloat *vertices_sub_tab,
 GLfloat			diff1, GLfloat diff2, GLfloat diff3);
 void			do_for_each(GLfloat *tab1, GLfloat *tab2,
 GLfloat *tab3, void (*func)(GLfloat *tab));
-GLfloat			degrees_to_radians(GLfloat degrees);
 void			gl_check_errors(const char *msg);
 void			*secure_malloc(const size_t len);
 void			change_shaker(t_parsing_storage *st);
@@ -123,5 +122,20 @@ void 			compile_shader(GLenum shader_type, unsigned int *shader_handle,
 const char 		*shader_source);
 void 			check_compilation_step_success(unsigned int handle,
 void (*getter)(unsigned int, GLenum, int*), GLenum status);
+void			render_frame(GLuint *handles, GLuint texture,
+size_t len, t_master *m);
+void			render_frame_part_one(GLfloat *home_model, GLuint texture, t_master *m);
+void			handle_smooth_transition(t_master *render_data, GLuint time);
+void			handle_events(char *params, t_master *m);
+void			error_check_sdl(char val);
+void			parse_face_point(t_parsing_storage *st);
+char			is_digit(const char c);
+void			handle_fourth_face(t_parsing_storage *st);
+void			parse_vertexs_and_text_coords(t_parsing_storage *st);
+void			handle_events_part_one(SDL_Event *e, char *params, t_master *m);
+void			handle_events_part_two(SDL_Event *e, t_master *m);
+void			normalize(GLfloat *vec);
+void			parse_texture_coords(t_parsing_storage *st);
+void			generate_tex_coord_for_vertex(t_parsing_storage *st);
 
 #endif

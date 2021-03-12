@@ -63,7 +63,7 @@ void	rotation_mat4(GLfloat *mat4, GLfloat radian_angle, GLfloat *axis)
 	mat4[15] = 1;
 }
 
-void	render_frame_part_one(GLfloat *home_model, UINT texture, t_master *m)
+void	render_frame_part_one(GLfloat *home_model, GLuint texture, t_master *m)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl_check_errors("glClear");
@@ -74,5 +74,5 @@ void	render_frame_part_one(GLfloat *home_model, UINT texture, t_master *m)
 	m->home_view = translation_mat4(m->relative_coordinates[0],
 	m->relative_coordinates[1], m->relative_coordinates[2]);
 	m->home_proj = perspective_mat4((float)800 / (float)600,
-	degrees_to_radians(45), 0.1f, 100.0f);
+	45 * (3.14159265359 / 180.0f), 0.1f, 100.0f);
 }

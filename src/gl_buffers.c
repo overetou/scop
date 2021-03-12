@@ -60,7 +60,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	return (st.final_vertices);
 }
 
-void	allocate_gso_part_one(UINT *handles, GLfloat *home_vertices,
+void	allocate_gso_part_one(GLuint *handles, GLfloat *home_vertices,
 size_t vertices_len)
 {
 	glGenVertexArrays(1, handles + 4);
@@ -88,7 +88,7 @@ size_t vertices_len)
 	check_compilation_step_success(handles[3], glGetProgramiv, GL_LINK_STATUS);
 }
 
-size_t	allocate_graphic_side_objects(UINT *handles, t_master *m)
+size_t	allocate_graphic_side_objects(GLuint *handles, t_master *m)
 {
 	m->home_vertices = load_vertices(m->obj_file_path, &(m->vertices_len));
 	allocate_gso_part_one(handles, m->home_vertices, m->vertices_len);
@@ -116,7 +116,7 @@ size_t	allocate_graphic_side_objects(UINT *handles, t_master *m)
 	return (m->vertices_len / 8);
 }
 
-void	desallocate_graphic_side_objects(UINT *handles)
+void	desallocate_graphic_side_objects(GLuint *handles)
 {
 	glDeleteVertexArrays(1, handles + 4);
 	gl_check_errors("glDeleteVertexArrays");

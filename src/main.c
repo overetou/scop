@@ -13,7 +13,7 @@
 #include "scop.h"
 #include <fcntl.h>
 
-void			render_frame(UINT *handles, UINT texture,
+void			render_frame(GLuint *handles, GLuint texture,
 size_t len, t_master *m)
 {
 	GLfloat	home_model[16];
@@ -66,7 +66,7 @@ unsigned char	*load_bmp(const char *file_path, int *width, int *height)
 	return (data);
 }
 
-void			init_render_step_one(t_master *m, char *params, UINT *handles)
+void			init_render_step_one(t_master *m, char *params, GLuint *handles)
 {
 	bzero(&(m->transition_time_marker),
 	sizeof(GLuint) + sizeof(GLfloat) + sizeof(char));
@@ -97,7 +97,7 @@ void			init_render_step_one(t_master *m, char *params, UINT *handles)
 
 void			init_render(t_master *m)
 {
-	UINT handles[6];
+	GLuint handles[6];
 	char params[2];
 
 	init_render_step_one(m, params, handles);
