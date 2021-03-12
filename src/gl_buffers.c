@@ -47,6 +47,7 @@ GLfloat	*load_vertices(const char *file_name, size_t *vertices_len)
 	(st.file_content)[st.file_size] = '\0';
 	error_check(read(fd, st.file_content, st.file_size)
 	== (ssize_t)(st.file_size), "Unable to read obj file correctly.");
+	close(fd);
 	parse_vertexs_and_text_coords(&st);
 	normalize_obj(st.vertices, st.vert_size);
 	st.i = 0;

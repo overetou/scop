@@ -91,8 +91,9 @@ void	parse_vertexs_and_text_coords(t_parsing_storage *st)
 			st->i += 3;
 			(st->vts) = (GLfloat*)realloc(st->vts,
 			((st->len_vts) + 2) * sizeof(GLfloat));
-			sscanf(st->file_content + st->i, "%f %f", (st->vts) +
-			(st->len_vts), (st->vts) + (st->len_vts) + 1);
+			error_check(sscanf(st->file_content + st->i, "%f %f", (st->vts) +
+			(st->len_vts), (st->vts) + (st->len_vts) + 1) == 2,
+			"Obj parsing failed.");
 			st->len_vts += 2;
 		}
 		while (st->i != st->file_size && st->file_content[st->i] != '\n')
