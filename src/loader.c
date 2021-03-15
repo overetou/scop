@@ -37,7 +37,7 @@ void			handle_events_part_three(SDL_Event *e, t_master *m)
 	}
 	else if (e->key.keysym.sym == SDLK_MINUS)
 	{
-		if (m->relative_coordinates[2] > -7)
+		if (m->relative_coordinates[2] > -50)
 			m->relative_coordinates[2] -= 0.5;
 	}
 	else if (e->key.keysym.sym == SDLK_z)
